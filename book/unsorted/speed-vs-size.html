@@ -1,0 +1,303 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>优化：速度大小的权衡 - The Embedded Rust Book</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../intro/index.html"><strong aria-hidden="true">1.</strong> 简介</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../intro/hardware.html"><strong aria-hidden="true">1.1.</strong> 硬件</a></li><li class="chapter-item expanded "><a href="../intro/no-std.html"><strong aria-hidden="true">1.2.</strong> no_std</a></li><li class="chapter-item expanded "><a href="../intro/tooling.html"><strong aria-hidden="true">1.3.</strong> 工具</a></li><li class="chapter-item expanded "><a href="../intro/install.html"><strong aria-hidden="true">1.4.</strong> 安装</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../intro/install/linux.html"><strong aria-hidden="true">1.4.1.</strong> Linux</a></li><li class="chapter-item expanded "><a href="../intro/install/macos.html"><strong aria-hidden="true">1.4.2.</strong> MacOS</a></li><li class="chapter-item expanded "><a href="../intro/install/windows.html"><strong aria-hidden="true">1.4.3.</strong> Windows</a></li><li class="chapter-item expanded "><a href="../intro/install/verify.html"><strong aria-hidden="true">1.4.4.</strong> 验证安装</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../start/index.html"><strong aria-hidden="true">2.</strong> 入门</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../start/qemu.html"><strong aria-hidden="true">2.1.</strong> QEMU</a></li><li class="chapter-item expanded "><a href="../start/hardware.html"><strong aria-hidden="true">2.2.</strong> 硬件</a></li><li class="chapter-item expanded "><a href="../start/registers.html"><strong aria-hidden="true">2.3.</strong> 内存映射寄存器</a></li><li class="chapter-item expanded "><a href="../start/semihosting.html"><strong aria-hidden="true">2.4.</strong> 半主机</a></li><li class="chapter-item expanded "><a href="../start/panicking.html"><strong aria-hidden="true">2.5.</strong> 恐慌</a></li><li class="chapter-item expanded "><a href="../start/exceptions.html"><strong aria-hidden="true">2.6.</strong> 异常</a></li><li class="chapter-item expanded "><a href="../start/interrupts.html"><strong aria-hidden="true">2.7.</strong> 中断</a></li><li class="chapter-item expanded "><a href="../start/io.html"><strong aria-hidden="true">2.8.</strong> IO</a></li></ol></li><li class="chapter-item expanded "><a href="../peripherals/index.html"><strong aria-hidden="true">3.</strong> 外设</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../peripherals/a-first-attempt.html"><strong aria-hidden="true">3.1.</strong> 初试Rust</a></li><li class="chapter-item expanded "><a href="../peripherals/borrowck.html"><strong aria-hidden="true">3.2.</strong> 借用检查器</a></li><li class="chapter-item expanded "><a href="../peripherals/singletons.html"><strong aria-hidden="true">3.3.</strong> 单例</a></li></ol></li><li class="chapter-item expanded "><a href="../static-guarantees/index.html"><strong aria-hidden="true">4.</strong> 静态保证</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../static-guarantees/typestate-programming.html"><strong aria-hidden="true">4.1.</strong> 类型状态机编程</a></li><li class="chapter-item expanded "><a href="../static-guarantees/state-machines.html"><strong aria-hidden="true">4.2.</strong> 外设作为状态机</a></li><li class="chapter-item expanded "><a href="../static-guarantees/design-contracts.html"><strong aria-hidden="true">4.3.</strong> 设计合约</a></li><li class="chapter-item expanded "><a href="../static-guarantees/zero-cost-abstractions.html"><strong aria-hidden="true">4.4.</strong> 零成本抽象</a></li></ol></li><li class="chapter-item expanded "><a href="../portability/index.html"><strong aria-hidden="true">5.</strong> 可移植性</a></li><li class="chapter-item expanded "><a href="../concurrency/index.html"><strong aria-hidden="true">6.</strong> 并发</a></li><li class="chapter-item expanded "><a href="../collections/index.html"><strong aria-hidden="true">7.</strong> 容器</a></li><li class="chapter-item expanded "><a href="../c-tips/index.html"><strong aria-hidden="true">8.</strong> 嵌入式C开发人员的技巧</a></li><li class="chapter-item expanded "><a href="../interoperability/index.html"><strong aria-hidden="true">9.</strong> 互操作性</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../interoperability/c-with-rust.html"><strong aria-hidden="true">9.1.</strong> Rust中使用C代码</a></li><li class="chapter-item expanded "><a href="../interoperability/rust-with-c.html"><strong aria-hidden="true">9.2.</strong> C中使用Rust代码</a></li></ol></li><li class="chapter-item expanded "><a href="../unsorted/index.html"><strong aria-hidden="true">10.</strong> 其他主题</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../unsorted/speed-vs-size.html" class="active"><strong aria-hidden="true">10.1.</strong> 优化：速度大小的权衡</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../appendix/glossary.html">Appendix A: Glossary</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">The Embedded Rust Book</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#优化速度大小的权衡" id="优化速度大小的权衡">优化：速度大小的权衡</a></h1>
+<p>每个人都希望他们的程序超快，超小，但通常不可能兼具这两个特性。本节讨论<code>rustc</code> 提供的不同优化级别，以及它们如何影响程序的执行时间和二进制大小。</p>
+<h2><a class="header" href="#没有优化" id="没有优化">没有优化</a></h2>
+<p>这是默认值。当您调用<code>cargo build</code>时，可以使用开发(也就是<code>dev</code>)配置文件。这个配置文件针对调试进行了优化，因此它启用调试信息并且<em>不</em>启用任何优化，即它使用<code>-C opt-level = 0</code>。</p>
+<p>至少对于裸机开发而言，debuginfo的成本为零，因为它不会占用Flash/ROM中的空间，因此我们建议您在发行配置文件中启用debuginfo(默认情况下处于禁用状态)。这样您就可以在调试发行版时使用断点。</p>
+<pre><code class="language-toml">[profile.release]
+# symbols are nice and they don't increase the size on Flash
+debug = true
+</code></pre>
+<p>禁用优化对调试很有效，因为单步执行代码就像逐行执行代码一样，而且可以在GDB中“打印”堆栈变量和函数参数。优化代码后，尝试打印变量将导致打印<code>$0 = &lt;value optimized out&gt;</code>。</p>
+<p>dev配置文件的最大缺点是，生成的二进制文件会很大且很慢。大小通常是一个更大的问题，因为未优化的二进制文件可能会占用数十KiB的Flash，而目标设备可能没有这么大空间，这会导致：未优化的二进制文件不适合您的设备！</p>
+<p>我们可以使用较小的，调试器友好的二进制文件吗？是的，有个窍门。</p>
+<h3><a class="header" href="#优化依赖" id="优化依赖">优化依赖</a></h3>
+<p>有一个名为<a href="https://doc.rust-lang.org/cargo/reference/profiles.html#overrides"><code>profile-overrides</code></a>的cargo特性，可让您覆盖依赖的crate的优化级别。您可以使用该功能优化所有依赖的crate的大小，同时保持项目自身不优化和对调试器的友好性。</p>
+<p>这是一个例子：</p>
+<pre><code class="language-toml"># Cargo.toml
+[package]
+name = &quot;app&quot;
+# ..
+
+[profile.dev.package.&quot;*&quot;] # +
+opt-level = &quot;z&quot; # +
+</code></pre>
+<p>没有覆盖默认优化时：</p>
+<pre><code class="language-console">$ cargo size --bin app -- -A
+app  :
+section               size        addr
+.vector_table         1024   0x8000000
+.text                 9060   0x8000400
+.rodata               1708   0x8002780
+.data                    0  0x20000000
+.bss                     4  0x20000000
+</code></pre>
+<p>使用覆盖：</p>
+<pre><code class="language-console">$ cargo size --bin app -- -A
+app  :
+section               size        addr
+.vector_table         1024   0x8000000
+.text                 3490   0x8000400
+.rodata               1100   0x80011c0
+.data                    0  0x20000000
+.bss                     4  0x20000000
+</code></pre>
+<p>闪存使用量减少了6 KiB，而项目自身的可调试性没有任何损失。如果在调试时,您进入依赖项，您将再次看到那些<code>&lt;value Optimized out&gt;</code>消息，但是通常情况下，您要调试的是项目自身而不是依赖项。而且如果您需要调试依赖项，则可以使用<code>profile-overrides</code>特性来排除特定的依赖项，以使其不被优化。请参见下面的示例：</p>
+<pre><code class="language-toml"># ..
+
+# don't optimize the `cortex-m-rt` crate
+[profile.dev.package.cortex-m-rt] # +
+opt-level = 0 # +
+
+# but do optimize all the other dependencies
+[profile.dev.package.&quot;*&quot;]
+codegen-units = 1 # better optimizations
+opt-level = &quot;z&quot;
+</code></pre>
+<p>现在，项目自身和<code>cortex-m-rt</code>都对调试器友好了！</p>
+<h2><a class="header" href="#优化速度" id="优化速度">优化速度</a></h2>
+<p>自2018年9月18日起，rustc支持三种“优化速度”级别<code>opt-level = 1,2,3</code>。当您运行<code>cargo build --release</code>时，您使用的是发布配置文件，默认为<code>opt-level = 3</code>。</p>
+<p><code>opt-level = 2</code> 和<code>3</code>都针对速度进行了优化，但以二进制大小为代价，3级比2级进行了更多的矢量化和内联。特别是，您将看到在opt-level等于或大于2的情况下，LLVM可能会展开循环。就Flash/ROM而言，循环展开具有相当高的成本(例如，对于一个将数组清零的循环，大小可能从26个字节到增大到194个字节)，但在合适的条件下(例如迭代次数足够大)，也可以将执行时间减半。</p>
+<p>当前没有办法在 <code>opt-level = 2,3</code>时禁用循环展开，因此，如果您负担不起其成本，则应针对大小优化程序。</p>
+<h2><a class="header" href="#优化尺寸" id="优化尺寸">优化尺寸</a></h2>
+<p>从2018年9月18日开始，rustc支持两个“大小优化”级别：<code>opt-level = s,z</code>。这些名称是从clang/LLVM继承的，所以描述性不太强，“z”的含义是产生比“s”更小的二进制文件。</p>
+<p>如果您希望优化发布二进制文件的大小，请按如下所示,在Cargo.toml中更改profile.release.opt-level设置。</p>
+<pre><code class="language-toml">[profile.release]
+# or &quot;z&quot;
+opt-level = &quot;s&quot;
+</code></pre>
+<p>这两个优化级别大大降低了LLVM的内联阈值，该阈值用于确定是否内联函数。 Rust原则之一是零成本抽象。这些抽象倾向于使用大量的新类型和小的函数来保存不变式(例如，诸如“ deref”，“as_ref”之类的借用内部值的函数)，因此低的内联阈值会使LLVM错过优化机会(例如，消除无效分支，闭包的内联)。</p>
+<p>在优化大小时，您可能想尝试增加内联阈值，以查看这是否对二进制大小有影响。推荐的更改内联阈值的方法是将<code>-C inline-threshold</code> 参数附加到<code>.cargo/config</code>中的rustflags。</p>
+<pre><code class="language-toml"># .cargo/config
+# this assumes that you are using the cortex-m-quickstart template
+[target.'cfg(all(target_arch = &quot;arm&quot;, target_os = &quot;none&quot;))']
+rustflags = [
+  # ..
+  &quot;-C&quot;, &quot;inline-threshold=123&quot;, # +
+]
+</code></pre>
+<p>内联阈值使用什么值合适？从1.29.0开始，下面是不同优化级别使用的[内联阈值]:</p>
+<ul>
+<li><code>opt-level = 3</code> 使用275</li>
+<li><code>opt-level = 2</code> 使用225</li>
+<li><code>opt-level =“ s”</code> 使用75</li>
+<li><code>opt-level =“ z” </code>使用25</li>
+</ul>
+<p>在优化大小时，应尝试使用较大的内联阈值比如“225”和“275”。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../unsorted/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../appendix/glossary.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../unsorted/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../appendix/glossary.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

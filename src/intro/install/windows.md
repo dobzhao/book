@@ -2,7 +2,7 @@
 
 ## `arm-none-eabi-gdb`
 
-ARM为Windows提供exe安装程序。从[gcc]这里下载，然后按照说明进行操作。在安装过程即将完成之前，勾选“Add path to environment variable”选项。然后验证工具是否在您的“％PATH％”中：
+ARM为Windows提供了exe安装程序。从这里下载[gcc]，然后按照说明进行操作。在安装过程即将完成之前，勾选“Add path to environment variable”选项。然后验证工具是否在您的“％PATH％”中：
 
 ``` console
 $ arm-none-eabi-gdb -v

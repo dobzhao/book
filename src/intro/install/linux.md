@@ -4,10 +4,11 @@
 
 ## 安装包
 
-- Ubuntu 18.04或更高版本/Debian Stretch或更高版本
+- Ubuntu 18.04或更高版本
+- Debian Stretch或更高版本
 
-> **注意**`gdb-multiarch`是用于调试ARM的GDB命令
-> Cortex-M程序
+> **注意**`gdb-multiarch`是用于调试ARM Cortex-M程序的GDB命令
+> 
 
  <!-- Debian stretch -->
 <!-- GDB 7.12 -->
@@ -25,13 +26,10 @@ sudo apt install gdb-multiarch openocd qemu-system-arm
 
 - Ubuntu 14.04和16.04
 
-> **注意**`arm-none-eabi-gdb`是用于调试ARM的GDB命令
-> Cortex-M程序
-
-<！-Ubuntu 14.04->
-<！-GDB 7.6(！)->
-<！-OpenOCD 0.7.0(？)->
-<！-QEMU 2.0.0(？)->
+<!--Ubuntu 14.04-->
+<!--GDB 7.6(！)-->
+<!--OpenOCD 0.7.0(？)-->
+<!--QEMU 2.0.0(？)-->
 
 ```sh
 sudo apt install gdb-arm-none-eabi openocd qemu-system-arm
@@ -39,8 +37,7 @@ sudo apt install gdb-arm-none-eabi openocd qemu-system-arm
 
 - Fedora 27或更高版本
 
-> **注意**`arm-none-eabi-gdb`是用于调试ARM的GDB命令
-> Cortex-M程序
+
 
 <!-- Fedora 27 -->
 <!-- GDB 7.6 (!) -->
@@ -53,8 +50,6 @@ sudo dnf install arm-none-eabi-gdb openocd qemu-system-arm
 
 - Arch Linux
 
-> **注意**`arm-none-eabi-gdb`是用于调试ARM的GDB命令
-> Cortex-M程序
 
 ``` console
 sudo pacman -S arm-none-eabi-gdb qemu-arch-extra openocd
@@ -62,7 +57,7 @@ sudo pacman -S arm-none-eabi-gdb qemu-arch-extra openocd
 
 ## udev规则
 
-该规则使您可以在没有root特权的情况下将OpenOCD与Discovery开发板一起使用。
+该规则使您可以在不需要root特权的情况下将OpenOCD与Discovery开发板一起使用。
 
 创建文件`/etc/udev/rules.d/70-st-link.rules`，内容如下所示。
 
@@ -116,7 +111,7 @@ user::rw-
 user:you:rw-
 ```
 
-权限后面的“ +”表示存在扩展权限。 “getfacl”命令告诉用户“您”可以使用此设备。
+权限后面的“ +”表示存在扩展权限。 “getfacl”命令显示当且用户可以使用此设备。
 
 现在，转到[下一部分]。
 

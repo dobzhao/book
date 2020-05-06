@@ -1,0 +1,388 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>异常 - The Embedded Rust Book</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../intro/index.html"><strong aria-hidden="true">1.</strong> 简介</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../intro/hardware.html"><strong aria-hidden="true">1.1.</strong> 硬件</a></li><li class="chapter-item expanded "><a href="../intro/no-std.html"><strong aria-hidden="true">1.2.</strong> no_std</a></li><li class="chapter-item expanded "><a href="../intro/tooling.html"><strong aria-hidden="true">1.3.</strong> 工具</a></li><li class="chapter-item expanded "><a href="../intro/install.html"><strong aria-hidden="true">1.4.</strong> 安装</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../intro/install/linux.html"><strong aria-hidden="true">1.4.1.</strong> Linux</a></li><li class="chapter-item expanded "><a href="../intro/install/macos.html"><strong aria-hidden="true">1.4.2.</strong> MacOS</a></li><li class="chapter-item expanded "><a href="../intro/install/windows.html"><strong aria-hidden="true">1.4.3.</strong> Windows</a></li><li class="chapter-item expanded "><a href="../intro/install/verify.html"><strong aria-hidden="true">1.4.4.</strong> 验证安装</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../start/index.html"><strong aria-hidden="true">2.</strong> 入门</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../start/qemu.html"><strong aria-hidden="true">2.1.</strong> QEMU</a></li><li class="chapter-item expanded "><a href="../start/hardware.html"><strong aria-hidden="true">2.2.</strong> 硬件</a></li><li class="chapter-item expanded "><a href="../start/registers.html"><strong aria-hidden="true">2.3.</strong> 内存映射寄存器</a></li><li class="chapter-item expanded "><a href="../start/semihosting.html"><strong aria-hidden="true">2.4.</strong> 半主机</a></li><li class="chapter-item expanded "><a href="../start/panicking.html"><strong aria-hidden="true">2.5.</strong> 恐慌</a></li><li class="chapter-item expanded "><a href="../start/exceptions.html" class="active"><strong aria-hidden="true">2.6.</strong> 异常</a></li><li class="chapter-item expanded "><a href="../start/interrupts.html"><strong aria-hidden="true">2.7.</strong> 中断</a></li><li class="chapter-item expanded "><a href="../start/io.html"><strong aria-hidden="true">2.8.</strong> IO</a></li></ol></li><li class="chapter-item expanded "><a href="../peripherals/index.html"><strong aria-hidden="true">3.</strong> 外设</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../peripherals/a-first-attempt.html"><strong aria-hidden="true">3.1.</strong> 初试Rust</a></li><li class="chapter-item expanded "><a href="../peripherals/borrowck.html"><strong aria-hidden="true">3.2.</strong> 借用检查器</a></li><li class="chapter-item expanded "><a href="../peripherals/singletons.html"><strong aria-hidden="true">3.3.</strong> 单例</a></li></ol></li><li class="chapter-item expanded "><a href="../static-guarantees/index.html"><strong aria-hidden="true">4.</strong> 静态保证</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../static-guarantees/typestate-programming.html"><strong aria-hidden="true">4.1.</strong> 类型状态机编程</a></li><li class="chapter-item expanded "><a href="../static-guarantees/state-machines.html"><strong aria-hidden="true">4.2.</strong> 外设作为状态机</a></li><li class="chapter-item expanded "><a href="../static-guarantees/design-contracts.html"><strong aria-hidden="true">4.3.</strong> 设计合约</a></li><li class="chapter-item expanded "><a href="../static-guarantees/zero-cost-abstractions.html"><strong aria-hidden="true">4.4.</strong> 零成本抽象</a></li></ol></li><li class="chapter-item expanded "><a href="../portability/index.html"><strong aria-hidden="true">5.</strong> 可移植性</a></li><li class="chapter-item expanded "><a href="../concurrency/index.html"><strong aria-hidden="true">6.</strong> 并发</a></li><li class="chapter-item expanded "><a href="../collections/index.html"><strong aria-hidden="true">7.</strong> 容器</a></li><li class="chapter-item expanded "><a href="../c-tips/index.html"><strong aria-hidden="true">8.</strong> 嵌入式C开发人员的技巧</a></li><li class="chapter-item expanded "><a href="../interoperability/index.html"><strong aria-hidden="true">9.</strong> 互操作性</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../interoperability/c-with-rust.html"><strong aria-hidden="true">9.1.</strong> Rust中使用C代码</a></li><li class="chapter-item expanded "><a href="../interoperability/rust-with-c.html"><strong aria-hidden="true">9.2.</strong> C中使用Rust代码</a></li></ol></li><li class="chapter-item expanded "><a href="../unsorted/index.html"><strong aria-hidden="true">10.</strong> 其他主题</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../unsorted/speed-vs-size.html"><strong aria-hidden="true">10.1.</strong> 优化：速度大小的权衡</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../appendix/glossary.html">Appendix A: Glossary</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">The Embedded Rust Book</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#异常" id="异常">异常</a></h1>
+<p>异常和中断是一种硬件机制，处理器通过该机制处理异步事件和致命错误(例如执行无效指令)。异常意味着抢占，也包括异常处理程序，发生异常时,这些子程序会被立即执行,以响应触发异常的信号。</p>
+<p>cortex-m-rt crate提供了一个<a href="https://docs.rs/cortex-m-rt-macros/latest/cortex_m_rt_macros/attr.exception.html"><code>exception</code></a>属性来声明异常处理程序。</p>
+<pre><code class="language-rust ignore">// Exception handler for the SysTick (System Timer) exception
+#[exception]
+fn SysTick() {
+    // ..
+}
+</code></pre>
+<p>除了<code>exception</code> 属性之外，异常处理程序看起来像普通函数，但还有另外一个区别：<code>exception</code> 处理程序不能被软件调用。上面的示例中，语句<code>SysTick();</code>将导致编译错误。</p>
+<p>这种行为是有意为之，<code>exception</code>属性还让在异常处理程序中声明<code>static mut</code>变量是安全的。</p>
+<pre><code class="language-rust ignore">#[exception]
+fn SysTick() {
+    static mut COUNT: u32 = 0;
+
+    // `COUNT` has type `&amp;mut u32` and it's safe to use
+    *COUNT += 1;
+}
+</code></pre>
+<p>如您所知，在函数中使用<code>static mut</code>变量使其成为<a href="https://en.wikipedia.org/wiki/Reentrancy_(computing)">不可重入</a>。 从多个异常/中断处理程序或<code>main</code>中直接或间接调用不可重入函数是不确定的行为。</p>
+<p>Safe Rust绝不能导致不确定的行为，因此非可重入函数必须标记为 <code>unsafe</code>。但是我刚刚却说异常处理程序可以安全地使用<code>static mut</code>变量。这怎么可能？这是可能的，因为异常处理程序不能被函数调用，因此无法重入。</p>
+<h2><a class="header" href="#一个完整的例子" id="一个完整的例子">一个完整的例子</a></h2>
+<p>这是一个使用系统计时器每秒引发一次<code>SysTick</code> 异常的示例。 SysTick异常处理程序通过COUNT变量跟踪自己被调用了多少次，然后使用半主机将COUNT的值打印到主机控制台。</p>
+<blockquote>
+<p><strong>注意</strong>：您可以在任何Cortex-M设备上运行此示例；您也可以在QEMU上运行它</p>
+</blockquote>
+<pre><code class="language-rust ignore">#![deny(unsafe_code)]
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use core::fmt::Write;
+
+use cortex_m::peripheral::syst::SystClkSource;
+use cortex_m_rt::{entry, exception};
+use cortex_m_semihosting::{
+    debug,
+    hio::{self, HStdout},
+};
+
+#[entry]
+fn main() -&gt; ! {
+    let p = cortex_m::Peripherals::take().unwrap();
+    let mut syst = p.SYST;
+
+    // configures the system timer to trigger a SysTick exception every second
+    syst.set_clock_source(SystClkSource::Core);
+    // this is configured for the LM3S6965 which has a default CPU clock of 12 MHz
+    syst.set_reload(12_000_000);
+    syst.clear_current();
+    syst.enable_counter();
+    syst.enable_interrupt();
+
+    loop {}
+}
+
+#[exception]
+fn SysTick() {
+    static mut COUNT: u32 = 0;
+    static mut STDOUT: Option&lt;HStdout&gt; = None;
+
+    *COUNT += 1;
+
+    // Lazy initialization
+    if STDOUT.is_none() {
+        *STDOUT = hio::hstdout().ok();
+    }
+
+    if let Some(hstdout) = STDOUT.as_mut() {
+        write!(hstdout, &quot;{}&quot;, *COUNT).ok();
+    }
+
+    // IMPORTANT omit this `if` block if running on real hardware or your
+    // debugger will end in an inconsistent state
+    if *COUNT == 9 {
+        // This will terminate the QEMU process
+        debug::exit(debug::EXIT_SUCCESS);
+    }
+}
+</code></pre>
+<pre><code class="language-console">$ tail -n5 Cargo.toml
+</code></pre>
+<pre><code class="language-toml">[dependencies]
+cortex-m = &quot;0.5.7&quot;
+cortex-m-rt = &quot;0.6.3&quot;
+panic-halt = &quot;0.2.0&quot;
+cortex-m-semihosting = &quot;0.3.1&quot;
+</code></pre>
+<pre><code class="language-console">$ cargo run --release
+     Running `qemu-system-arm -cpu cortex-m3 -machine lm3s6965evb (..)
+123456789
+</code></pre>
+<p>如果在开发板上运行此命令，则会在OpenOCD控制台上看到输出。但是当计数达到9时，程序将<strong>不</strong>停止。</p>
+<h2><a class="header" href="#默认异常处理程序" id="默认异常处理程序">默认异常处理程序</a></h2>
+<p><code>exception</code>属性的实际作用是<strong>覆盖</strong>特定异常的默认异常处理程序。如果您不重写特定异常的处理程序，它将由<code>DefaultHandler</code>函数处理，该函数默认为：</p>
+<pre><code class="language-rust ignore">fn DefaultHandler() {
+    loop {}
+}
+</code></pre>
+<p>此功能由<code>cortex-m-rt</code>crate提供，并标记为 <code>#[no_mangle]</code>，因此您可以在“ DefaultHandler”上放置断点并捕获<strong>未处理</strong>异常。</p>
+<p>可以使用<code>exception</code>属性覆盖这个<code>DefaultHandler</code>：</p>
+<pre><code class="language-rust ignore">#[exception]
+fn DefaultHandler(irqn: i16) {
+    // custom default handler
+}
+</code></pre>
+<p>irqn是正在处理的异常编号。负值表示Cortex-M异常；零或正值表示设备特定的异常，即AKA中断。</p>
+<h2><a class="header" href="#硬故障处理程序" id="硬故障处理程序">硬故障处理程序</a></h2>
+<p><code>HardFault</code>异常有点特殊。当程序进入无效状态时，将引发此异常，因此它的处理程序不能返回，因为这可能导致未定义的行为。另外，在调用用户定义的<code>HardFault</code>前，运行时crate会做一些工作以提高程序的可调试性。</p>
+<p>所以<code>HardFault</code>处理函数必须具有以下签名：<code>fn(＆ExceptionFrame)-&gt;！</code>。处理程序的参数是指向被异常压入堆栈的寄存器的指针。这些寄存器是异常触发时处理器状态的快照，可用于诊断故障。</p>
+<p>这是一个执行非法操作的示例：读取不存在的内存位置。</p>
+<blockquote>
+<p><strong>注意</strong>：该程序在QEMU上不起作用，即不会崩溃，因为<code>qemu-system-arm -machine lm3s6965evb</code>不会检查内存读取，并且在读取到无效内存时会很高兴地返回<code>0</code>。</p>
+</blockquote>
+<pre><code class="language-rust ignore">#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use core::fmt::Write;
+use core::ptr;
+
+use cortex_m_rt::{entry, exception, ExceptionFrame};
+use cortex_m_semihosting::hio;
+
+#[entry]
+fn main() -&gt; ! {
+    // read a nonexistent memory location
+    unsafe {
+        ptr::read_volatile(0x3FFF_FFFE as *const u32);
+    }
+
+    loop {}
+}
+
+#[exception]
+fn HardFault(ef: &amp;ExceptionFrame) -&gt; ! {
+    if let Ok(mut hstdout) = hio::hstdout() {
+        writeln!(hstdout, &quot;{:#?}&quot;, ef).ok();
+    }
+
+    loop {}
+}
+</code></pre>
+<p><code>HardFault</code>处理程序将打印<code>ExceptionFrame</code>值。如果运行此程序，您将在OpenOCD控制台上看到类似的内容。</p>
+<pre><code class="language-console">$ openocd
+(..)
+ExceptionFrame {
+    r0: 0x3ffffffe,
+    r1: 0x00f00000,
+    r2: 0x20000000,
+    r3: 0x00000000,
+    r12: 0x00000000,
+    lr: 0x080008f7,
+    pc: 0x0800094a,
+    xpsr: 0x61000000
+}
+</code></pre>
+<p><code>pc</code> 值是发生异常时程序计数器的值，它指向触发异常的指令。</p>
+<p>如果您查看程序的反汇编：</p>
+<pre><code class="language-console">$ cargo objdump --bin app --release -- -d -no-show-raw-insn -print-imm-hex
+(..)
+ResetTrampoline:
+ 8000942:       movw    r0, #0xfffe
+ 8000946:       movt    r0, #0x3fff
+ 800094a:       ldr     r0, [r0]
+ 800094c:       b       #-0x4 &lt;ResetTrampoline+0xa&gt;
+</code></pre>
+<p>您可以在反汇编中查找程序计数器<code>0x0800094a</code> 的值。您将看到加载操作(<code>ldr r0，[r0]</code>)引起了异常。 <code>ExceptionFrame</code>的<code>r0</code>字段将告诉您寄存器r0的值为当时的0x3fff_fffe。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../start/panicking.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../start/interrupts.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../start/panicking.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../start/interrupts.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

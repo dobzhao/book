@@ -1,0 +1,301 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Rust中使用C代码 - The Embedded Rust Book</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../intro/index.html"><strong aria-hidden="true">1.</strong> 简介</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../intro/hardware.html"><strong aria-hidden="true">1.1.</strong> 硬件</a></li><li class="chapter-item expanded "><a href="../intro/no-std.html"><strong aria-hidden="true">1.2.</strong> no_std</a></li><li class="chapter-item expanded "><a href="../intro/tooling.html"><strong aria-hidden="true">1.3.</strong> 工具</a></li><li class="chapter-item expanded "><a href="../intro/install.html"><strong aria-hidden="true">1.4.</strong> 安装</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../intro/install/linux.html"><strong aria-hidden="true">1.4.1.</strong> Linux</a></li><li class="chapter-item expanded "><a href="../intro/install/macos.html"><strong aria-hidden="true">1.4.2.</strong> MacOS</a></li><li class="chapter-item expanded "><a href="../intro/install/windows.html"><strong aria-hidden="true">1.4.3.</strong> Windows</a></li><li class="chapter-item expanded "><a href="../intro/install/verify.html"><strong aria-hidden="true">1.4.4.</strong> 验证安装</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../start/index.html"><strong aria-hidden="true">2.</strong> 入门</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../start/qemu.html"><strong aria-hidden="true">2.1.</strong> QEMU</a></li><li class="chapter-item expanded "><a href="../start/hardware.html"><strong aria-hidden="true">2.2.</strong> 硬件</a></li><li class="chapter-item expanded "><a href="../start/registers.html"><strong aria-hidden="true">2.3.</strong> 内存映射寄存器</a></li><li class="chapter-item expanded "><a href="../start/semihosting.html"><strong aria-hidden="true">2.4.</strong> 半主机</a></li><li class="chapter-item expanded "><a href="../start/panicking.html"><strong aria-hidden="true">2.5.</strong> 恐慌</a></li><li class="chapter-item expanded "><a href="../start/exceptions.html"><strong aria-hidden="true">2.6.</strong> 异常</a></li><li class="chapter-item expanded "><a href="../start/interrupts.html"><strong aria-hidden="true">2.7.</strong> 中断</a></li><li class="chapter-item expanded "><a href="../start/io.html"><strong aria-hidden="true">2.8.</strong> IO</a></li></ol></li><li class="chapter-item expanded "><a href="../peripherals/index.html"><strong aria-hidden="true">3.</strong> 外设</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../peripherals/a-first-attempt.html"><strong aria-hidden="true">3.1.</strong> 初试Rust</a></li><li class="chapter-item expanded "><a href="../peripherals/borrowck.html"><strong aria-hidden="true">3.2.</strong> 借用检查器</a></li><li class="chapter-item expanded "><a href="../peripherals/singletons.html"><strong aria-hidden="true">3.3.</strong> 单例</a></li></ol></li><li class="chapter-item expanded "><a href="../static-guarantees/index.html"><strong aria-hidden="true">4.</strong> 静态保证</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../static-guarantees/typestate-programming.html"><strong aria-hidden="true">4.1.</strong> 类型状态机编程</a></li><li class="chapter-item expanded "><a href="../static-guarantees/state-machines.html"><strong aria-hidden="true">4.2.</strong> 外设作为状态机</a></li><li class="chapter-item expanded "><a href="../static-guarantees/design-contracts.html"><strong aria-hidden="true">4.3.</strong> 设计合约</a></li><li class="chapter-item expanded "><a href="../static-guarantees/zero-cost-abstractions.html"><strong aria-hidden="true">4.4.</strong> 零成本抽象</a></li></ol></li><li class="chapter-item expanded "><a href="../portability/index.html"><strong aria-hidden="true">5.</strong> 可移植性</a></li><li class="chapter-item expanded "><a href="../concurrency/index.html"><strong aria-hidden="true">6.</strong> 并发</a></li><li class="chapter-item expanded "><a href="../collections/index.html"><strong aria-hidden="true">7.</strong> 容器</a></li><li class="chapter-item expanded "><a href="../c-tips/index.html"><strong aria-hidden="true">8.</strong> 嵌入式C开发人员的技巧</a></li><li class="chapter-item expanded "><a href="../interoperability/index.html"><strong aria-hidden="true">9.</strong> 互操作性</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../interoperability/c-with-rust.html" class="active"><strong aria-hidden="true">9.1.</strong> Rust中使用C代码</a></li><li class="chapter-item expanded "><a href="../interoperability/rust-with-c.html"><strong aria-hidden="true">9.2.</strong> C中使用Rust代码</a></li></ol></li><li class="chapter-item expanded "><a href="../unsorted/index.html"><strong aria-hidden="true">10.</strong> 其他主题</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../unsorted/speed-vs-size.html"><strong aria-hidden="true">10.1.</strong> 优化：速度大小的权衡</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../appendix/glossary.html">Appendix A: Glossary</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">The Embedded Rust Book</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#rust中使用c代码" id="rust中使用c代码">Rust中使用C代码</a></h1>
+<p>在Rust项目中使用C或C++代码包含两个主要部分：</p>
+<ul>
+<li>封装导出的的C API以供Rust调用</li>
+<li>构建要与Rust代码集成的C或C++代码</li>
+</ul>
+<p>由于C++没有稳定的ABI，因此将Rust与C或C++结合使用时，建议使用<code>C</code> ABI。</p>
+<h2><a class="header" href="#定义接口" id="定义接口">定义接口</a></h2>
+<p>在Rust中使用C或C++代码之前，有必要定义(用Rust编写)这些代码中存在哪些数据类型和函数。在C或C++中使用这些代码时，您需要包含定义相关的头文件(“.h”或“.hpp”)。在Rust中，需要将这些头文件手动转换为Rust代码，或使用工具生成。</p>
+<p>首先，我们将介绍如何将这些代码从C/C++手动转换为Rust。</p>
+<h3><a class="header" href="#封装c函数和数据类型" id="封装c函数和数据类型">封装C函数和数据类型</a></h3>
+<p>通常，用C或C++编写的库将提供头文件，该头文件定义公共接口中使用的所有类型和函数。比如下面的例子：</p>
+<pre><code class="language-C">/* File: cool.h */
+typedef struct CoolStruct {
+    int x;
+    int y;
+} CoolStruct;
+
+void cool_function(int i, char c, CoolStruct* cs);
+</code></pre>
+<p>转换为Rust后，代码如下所示：</p>
+<pre><code class="language-rust ignore">/* File: cool_bindings.rs */
+#[repr(C)]
+pub struct CoolStruct {
+    pub x: cty::c_int,
+    pub y: cty::c_int,
+}
+
+pub extern &quot;C&quot; fn cool_function(
+    i: cty::c_int,
+    c: cty::c_char,
+    cs: *mut CoolStruct
+);
+</code></pre>
+<p>让我们一次查看一个定义，以解释每个部分。</p>
+<pre><code class="language-rust ignore">#[repr(C)]
+pub struct CoolStruct { ... }
+</code></pre>
+<p>默认情况下，Rust不保证<code>struct</code>中包含的数据的顺序，填充或大小。为了保证与C代码的兼容性，我们加入了<code>#[repr(C)]</code> 属性，该属性指示Rust编译器使用C规则来组织结构体中的数据。</p>
+<pre><code class="language-rust ignore">pub x: cty::c_int,
+pub y: cty::c_int,
+</code></pre>
+<p>由于C/C++中<code>int</code>和<code>char</code>类型的灵活性，建议使用<code>cty</code>中定义的原始数据类型，它将原始类型从C映射到Rust中的类型。</p>
+<pre><code class="language-rust ignore">pub extern &quot;C&quot; fn cool_function( ... );
+</code></pre>
+<p>该语句定义使用C ABI的函数的签名，称为“ cool_function”。这里只定义了签名，需要在其他位置提供此函数的定义，或者将其链接到相关的动态或者库文件中。</p>
+<pre><code class="language-rust ignore">    i: cty::c_int,
+    c: cty::c_char,
+    cs: *mut CoolStruct
+</code></pre>
+<p>与上面的数据类型类似，我们使用C兼容的定义来定义函数参数的数据类型。为了清楚起见，我们还保留相同的参数名称。</p>
+<p>我们这里有一种新类型，即<code>*mut CoolStruct</code>。由于C没有Rust引用的概念：<code>＆mut CoolStruct</code>，因此我们有一个裸指针。由于解引用此指针是“不安全的”，并且实际上该指针可能是“空”指针，因此在与C或C++代码进行交互时，必须小心确保Rust的典型保证。</p>
+<h3><a class="header" href="#自动生成接口" id="自动生成接口">自动生成接口</a></h3>
+<p>相比手动生成这些接口(可能很乏味且容易出错)，可以使用一种名为<a href="https://github.com/rust-lang/rust-bindgen">bindgen</a>的工具来自动执行这些转换。有关<a href="https://github.com/rust-lang/rust-bindgen">bindgen</a>用法的说明，请参阅<a href="https://rust-lang.github.io/rust-bindgen/">bindgen用户手册</a>，但是典型过程包括以下内容：</p>
+<ol>
+<li>收集所有要在Rust中使用的接口或数据类型的C或C++头文件</li>
+<li>编写一个“bindings.h”文件，其中的“ #include“ ...”`是您在第一步中收集的每个文件。</li>
+<li>将此“bindings.h”文件以及用于编译的所有编译标志提供给<code>bindgen</code>。注意使用``Builder.ctypes_prefix(&quot;cty&quot;)<code>/
+ </code>--ctypes-prefix=cty<code>和</code>Builder.use_core()<code> ,这样生成的代码才能和</code>#![no_std]` 兼容。</li>
+<li><code>bindgen</code>将生成的Rust代码生成输出到终端。该输出可以通过管道重定向到文件，例如“ bindings.rs”。您可以在Rust项目中使用此文件与作为外部库编译和链接的C/C ++代码进行交互。提示：如果生成的绑定中的类型以<code>cty</code>作为前缀，请不要忘记使用<a href="https://crates.io/crates/cty"><code>cty</code></a>crate。</li>
+</ol>
+<h2><a class="header" href="#构建c--c-代码" id="构建c--c-代码">构建C / C ++代码</a></h2>
+<p>由于Rust编译器不知道如何编译C或C++代码(或来自任何其他语言的代码，只要提供C接口即可)，因此有必要提前编译非Rust代码。</p>
+<p>对于嵌入式项目，这通常意味着将C/C ++代码编译为静态归档文件(例如“cool-library.a”)，然后可以在最后的链接步骤将其与Rust代码合并。</p>
+<p>如果您要使用的库已经作为静态库分发，则无需重新构建代码。只需像上面提到的转换接口文件，并在编译/链接时包含静态库文件。</p>
+<p>如果您依赖的代码以源代码形式提供，则必须先用现有的构建系统(例如“ make”，“ CMake”等)编译,或者移植编译过程使用<code>cc</code> crate进行编译。对于这两种情况，都需要使用一个build.rs脚本。</p>
+<h3><a class="header" href="#rustbuildrs构建脚本" id="rustbuildrs构建脚本">Rust<code>build.rs</code>构建脚本</a></h3>
+<p><code>build.rs</code>脚本是用Rust语法编写的文件，该文件在编译机上执行，在构建完项目本身的依赖项之后，但在构建项目本身之前。</p>
+<p>完整的参考资料可以在<a href="https://doc.rust-lang.org/cargo/reference/build-scripts.html">这里</a>中找到。 <code>build.rs</code>脚本对于生成代码(例如通过<a href="https://github.com/rust-lang/rust-bindgen">bindgen</a>)，调用外部构建系统(例如Make)或通过使用<code>cc</code> crate直接编译C/C ++非常有用。</p>
+<h3><a class="header" href="#调用外部构建系统" id="调用外部构建系统">调用外部构建系统</a></h3>
+<p>对于复杂的项目，最简单的方法是使用[<code>std::process::Command</code>]遍历相对路径，调用固定命令(例如<code>make library</code>，然后将生成的静态库复制到<code>target</code>目录中的正确位置。</p>
+<p>虽然你自己的项目以<code>no_std</code>嵌入式平台为目标，但是<code>build.rs</code>仅在执行编译的计算机上执行。这意味着您可以在<code>build.rs</code>中使用编译主机上的任何Rust crate。</p>
+<h3><a class="header" href="#使用cc-crate构建cc-代码" id="使用cc-crate构建cc-代码">使用<code>cc</code> crate构建C/C ++代码</a></h3>
+<p>对于不太复杂或者依赖较少的项目，或者难以修改构建系统以生成静态库(而不是最终的二进制文件或可执行文件)的项目，使用<a href="https://github.com/alexcrichton/cc-rs"><code>cc</code> crate</a>可能会更容易，它为主机提供的编译器封装了惯用的Rust接口。</p>
+<p>对于只有一个c文件的静态库的最简单情况,下面给出一个使用<a href="https://github.com/alexcrichton/cc-rs"><code>cc</code> crate</a>的示例:</p>
+<pre><code class="language-rust ignore">extern crate cc;
+
+fn main() {
+    cc::Build::new()
+        .file(&quot;foo.c&quot;)
+        .compile(&quot;libfoo.a&quot;);
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../interoperability/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../interoperability/rust-with-c.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../interoperability/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../interoperability/rust-with-c.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

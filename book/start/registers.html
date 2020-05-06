@@ -1,0 +1,367 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>内存映射寄存器 - The Embedded Rust Book</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../intro/index.html"><strong aria-hidden="true">1.</strong> 简介</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../intro/hardware.html"><strong aria-hidden="true">1.1.</strong> 硬件</a></li><li class="chapter-item expanded "><a href="../intro/no-std.html"><strong aria-hidden="true">1.2.</strong> no_std</a></li><li class="chapter-item expanded "><a href="../intro/tooling.html"><strong aria-hidden="true">1.3.</strong> 工具</a></li><li class="chapter-item expanded "><a href="../intro/install.html"><strong aria-hidden="true">1.4.</strong> 安装</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../intro/install/linux.html"><strong aria-hidden="true">1.4.1.</strong> Linux</a></li><li class="chapter-item expanded "><a href="../intro/install/macos.html"><strong aria-hidden="true">1.4.2.</strong> MacOS</a></li><li class="chapter-item expanded "><a href="../intro/install/windows.html"><strong aria-hidden="true">1.4.3.</strong> Windows</a></li><li class="chapter-item expanded "><a href="../intro/install/verify.html"><strong aria-hidden="true">1.4.4.</strong> 验证安装</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../start/index.html"><strong aria-hidden="true">2.</strong> 入门</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../start/qemu.html"><strong aria-hidden="true">2.1.</strong> QEMU</a></li><li class="chapter-item expanded "><a href="../start/hardware.html"><strong aria-hidden="true">2.2.</strong> 硬件</a></li><li class="chapter-item expanded "><a href="../start/registers.html" class="active"><strong aria-hidden="true">2.3.</strong> 内存映射寄存器</a></li><li class="chapter-item expanded "><a href="../start/semihosting.html"><strong aria-hidden="true">2.4.</strong> 半主机</a></li><li class="chapter-item expanded "><a href="../start/panicking.html"><strong aria-hidden="true">2.5.</strong> 恐慌</a></li><li class="chapter-item expanded "><a href="../start/exceptions.html"><strong aria-hidden="true">2.6.</strong> 异常</a></li><li class="chapter-item expanded "><a href="../start/interrupts.html"><strong aria-hidden="true">2.7.</strong> 中断</a></li><li class="chapter-item expanded "><a href="../start/io.html"><strong aria-hidden="true">2.8.</strong> IO</a></li></ol></li><li class="chapter-item expanded "><a href="../peripherals/index.html"><strong aria-hidden="true">3.</strong> 外设</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../peripherals/a-first-attempt.html"><strong aria-hidden="true">3.1.</strong> 初试Rust</a></li><li class="chapter-item expanded "><a href="../peripherals/borrowck.html"><strong aria-hidden="true">3.2.</strong> 借用检查器</a></li><li class="chapter-item expanded "><a href="../peripherals/singletons.html"><strong aria-hidden="true">3.3.</strong> 单例</a></li></ol></li><li class="chapter-item expanded "><a href="../static-guarantees/index.html"><strong aria-hidden="true">4.</strong> 静态保证</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../static-guarantees/typestate-programming.html"><strong aria-hidden="true">4.1.</strong> 类型状态机编程</a></li><li class="chapter-item expanded "><a href="../static-guarantees/state-machines.html"><strong aria-hidden="true">4.2.</strong> 外设作为状态机</a></li><li class="chapter-item expanded "><a href="../static-guarantees/design-contracts.html"><strong aria-hidden="true">4.3.</strong> 设计合约</a></li><li class="chapter-item expanded "><a href="../static-guarantees/zero-cost-abstractions.html"><strong aria-hidden="true">4.4.</strong> 零成本抽象</a></li></ol></li><li class="chapter-item expanded "><a href="../portability/index.html"><strong aria-hidden="true">5.</strong> 可移植性</a></li><li class="chapter-item expanded "><a href="../concurrency/index.html"><strong aria-hidden="true">6.</strong> 并发</a></li><li class="chapter-item expanded "><a href="../collections/index.html"><strong aria-hidden="true">7.</strong> 容器</a></li><li class="chapter-item expanded "><a href="../c-tips/index.html"><strong aria-hidden="true">8.</strong> 嵌入式C开发人员的技巧</a></li><li class="chapter-item expanded "><a href="../interoperability/index.html"><strong aria-hidden="true">9.</strong> 互操作性</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../interoperability/c-with-rust.html"><strong aria-hidden="true">9.1.</strong> Rust中使用C代码</a></li><li class="chapter-item expanded "><a href="../interoperability/rust-with-c.html"><strong aria-hidden="true">9.2.</strong> C中使用Rust代码</a></li></ol></li><li class="chapter-item expanded "><a href="../unsorted/index.html"><strong aria-hidden="true">10.</strong> 其他主题</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../unsorted/speed-vs-size.html"><strong aria-hidden="true">10.1.</strong> 优化：速度大小的权衡</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../appendix/glossary.html">Appendix A: Glossary</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">The Embedded Rust Book</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#内存映射寄存器" id="内存映射寄存器">内存映射寄存器</a></h1>
+<p>就目前我们所知,嵌入式系统只能执行常规的Rust代码,操作内存中的数据(todo: 什么样的系统不是这样?)。如果我们想获取或者修改系统的任何信息(例如，闪烁LED，检测到按钮的按下或与某种总线上的外设进行通信)，我们将不得不深入了解外设及其“内存映射寄存器”。</p>
+<p>现在已经存在不少问外设的crate,他们可以大致进行如下分类:</p>
+<ul>
+<li>
+<p>处理器架构相关Crate (Micro-architecture Crate) - 这种crate比较通用, 可处理CPU相关的通用例程以及一些通用外设。例如，<a href="https%EF%BC%9A//crates.io/crates/cortex-m">cortex-m</a>crate为您提供了启用和禁用中断的功能，这些功能对于所有基于Cortex-M的CPU都是相同的。它还使您可以访问所有基于Cortex-M的微控制器附带的时钟外设(SysTick)。</p>
+</li>
+<li>
+<p>外设相关Crate(PAC)-这种crate实际上是对特定CPU型号的内存映射寄存器的一个简单封装。例如，<a href="https://crates.io/crates/tm4c123x">tm4c123x</a>这个crate是对德州仪器(TI)Tiva-C TM4C123系列CPU的封装，<a href="https://crates.io/crates/stm32f30x">stm32f30x</a>这个crate是对ST-Micro STM32F30x系列CPU的封装。借助他们，您可以按照CPU参考手册中给出的每个外设的操作说明直接与寄存器进行交互。</p>
+</li>
+<li>
+<p>HAL crate - 这些crate通过实现<a href="https://crates.io/crates/embedded-hal">embedded-hal</a>中定义的一些常见Trait，来提供更友好的处理器相关API。例如，此crate可能提供一个<code>Serial</code>结构体，该结构体提供一个构造函数来配置一组GPIO引脚和波特率，并提供某种<code>write_byte</code>函数来发送数据。有关<a href="https://crates.io/crates/embedded-hal">embedded-hal</a>的更多信息，请参见<a href="../portability/index.html">可移植性</a>一章。</p>
+</li>
+</ul>
+<p>*开发板相关crate - 通过预先配置各种外设和GPIO引脚以适合特定的开发板，例如针对TM32F3DISCOVERY开发板的<a href="https://crates.io/crates/f3">F3</a>crate，这些crate相比HAL类crate,更易用。</p>
+<h2><a class="header" href="#从底层开始" id="从底层开始">从底层开始</a></h2>
+<p>让我们看一下所有基于Cortex-M的微控制器共有的SysTick外设。我们可以在<a href="https%EF%BC%9A//crates.io/crates/cortex-m">cortex-m</a>crate中找到一个相当低级的API，我们可以像这样使用它：</p>
+<pre><code class="language-rust ignore">use cortex_m::peripheral::{syst, Peripherals};
+use cortex_m_rt::entry;
+
+#[entry]
+fn main() -&gt; ! {
+    let mut peripherals = Peripherals::take().unwrap();
+    let mut systick = peripherals.SYST;
+    systick.set_clock_source(syst::SystClkSource::Core);
+    systick.set_reload(1_000);
+    systick.clear_current();
+    systick.enable_counter();
+    while !systick.has_wrapped() {
+        // Loop
+    }
+
+    loop {}
+}
+</code></pre>
+<p>SYST结构上的函数接口与ARM技术参考手册为此外围设备定义的功能非常接近。这个API中没有“延迟X毫秒”这样的函数接口,因此我们必须使用<code>while</code>循环来实现它。注意，在调用 <code>Peripherals::take()</code>之前，我们无法访问<code>SYST</code>结构体-这可确保整个程序中只有一个<code>SYST</code>实例。有关更多信息，请参见<a href="../peripherals/index.html">外围设备</a>部分。</p>
+<h2><a class="header" href="#使用外设cratepac" id="使用外设cratepac">使用外设crate(PAC)</a></h2>
+<p>如果我们将自己限制在每个Cortex-M附带的基本外围设备上，那么我们在嵌入式软件开发方面就不会走得太远。总有一天，我们需要编写一些特定于我们正在使用的特定微控制器的代码。在此示例中，假设我们使用德州仪器(TI)TM4C123这款款处理器(具有256 KiB Flash,80MHz的Cortex-M4)。我们需要<a href="https://crates.io/crates/tm4c123x">tm4c123x</a>这个crate以使用此芯片。</p>
+<pre><code class="language-rust ignore">#![no_std]
+#![no_main]
+
+extern crate panic_halt; // panic handler
+
+use cortex_m_rt::entry;
+use tm4c123x;
+
+#[entry]
+pub fn init() -&gt; (Delay, Leds) {
+    let cp = cortex_m::Peripherals::take().unwrap();
+    let p = tm4c123x::Peripherals::take().unwrap();
+
+    let pwm = p.PWM0;
+    pwm.ctl.write(|w| w.globalsync0().clear_bit());
+    // Mode = 1 =&gt; Count up/down mode
+    pwm._2_ctl.write(|w| w.enable().set_bit().mode().set_bit());
+    pwm._2_gena.write(|w| w.actcmpau().zero().actcmpad().one());
+    // 528 cycles (264 up and down) = 4 loops per video line (2112 cycles)
+    pwm._2_load.write(|w| unsafe { w.load().bits(263) });
+    pwm._2_cmpa.write(|w| unsafe { w.compa().bits(64) });
+    pwm.enable.write(|w| w.pwm4en().set_bit());
+}
+
+</code></pre>
+<p>除了调用<code>tm4c123x::Peripherals::take()</code>之外，我们访问PWM0外设的方式与之前访问SYST外设的方式完全相同。由于此crate是使用<a href="https://crates.io/crates/svd2rust">svd2rust</a>自动生成的，因此我们寄存器的访问函数采用闭包而不是数字参数。尽管这看起来有很多代码，但是Rust编译器可以为我们执行一堆检查以及优化，然后生成与手写汇编代码非常接近的机器代码！自动生成的代码如果无法确定特定访问器函数的参数的所有可能值均有效(例如，SVD将寄存器定义为32位整数，但实际上只有其中的某些值才有特殊含义,才有意义)，则该函数被标记为“不安全”。我们在上面的示例中使用<code>bits()</code> 函数设置 <code>load</code> 和<code>compa</code> 子字段时可以看到这一点。</p>
+<h3><a class="header" href="#读访问" id="读访问">读访问</a></h3>
+<p><code>read()</code> 函数返回一个对象R，该对象只有对该寄存器中各个子字段的只读访问权限，这些权限由制造商的该芯片的SVD文件定义。R上面定义的所有函数功能,您可以在[tm4c123x文档] <a href="https://docs.rs/tm4c123x/0.7.0/tm4c123x/pwm0/ctl/struct.R.html">tm4c123x文档R</a>中找到针对此款处理器,此种外设的具体寄存器的定义。</p>
+<pre><code class="language-rust ignore">if pwm.ctl.read().globalsync0().is_set() {
+    // Do a thing
+}
+</code></pre>
+<h3><a class="header" href="#写访问" id="写访问">写访问</a></h3>
+<p><code>write()</code>函数采用一个带有单个参数的闭包。通常我们将其称为 <code>w</code>。根据制造商关于此芯片的SVD文件，此参数可对该寄存器内的各个子字段进行读写访问。同样，<code>w</code>上面定义 所有函数功能,您可以在[tm4c123x文档] <a href="https://docs.rs/tm4c123x/0.7.0/tm4c123x/pwm0/ctl/struct.W.html">tm4c123x文档W</a>中找到针对此处理器,此外设的具体寄存器的定义。请注意，我们未设置的所有子字段都将被设置默认值-寄存器中的任何现有内容都将丢失。</p>
+<pre><code class="language-rust ignore">pwm.ctl.write(|w| w.globalsync0().clear_bit());
+</code></pre>
+<h3><a class="header" href="#修改" id="修改">修改</a></h3>
+<p>如果我们只想更改该寄存器中的一个特定子字段，而使其他子字段保持不变，则可以使用<code>modify</code>函数。此函数采用带有两个参数的闭包-一个用于读取，一个用于写入。通常，我们分别将它们称为<code>r</code>和<code>w</code>。 r参数可用于读取寄存器的当前内容，w参数可用于修改寄存器的内容。</p>
+<pre><code class="language-rust ignore">pwm.ctl.modify(|r, w| w.globalsync0().clear_bit());
+</code></pre>
+<p><code>modify</code>函数在这里显示了闭包的强大。在C语言中，我们必须读入到一些临时值，修改特定位上的值，然后将其写回。这意味着不小的出错几率：</p>
+<pre><code class="language-C">uint32_t temp = pwm0.ctl.read();
+temp |= PWM0_CTL_GLOBALSYNC0;
+pwm0.ctl.write(temp);
+uint32_t temp2 = pwm0.enable.read();
+temp2 |= PWM0_ENABLE_PWM4EN;
+pwm0.enable.write(temp); // Uh oh! Wrong variable!
+</code></pre>
+<h2><a class="header" href="#使用hal-crate" id="使用hal-crate">使用HAL crate</a></h2>
+<p>具体芯片的HAL crate一般是通过为PAC crate导出的结构体实现自定义Trait来工作。通常，这个自定义crate为单体外设定义一个名为 <code>constrain()</code> 的函数，为具有多个引脚的GPIO端口之类的外设定义 <code>split()</code> 函数。该函数将消耗底层的原始外围设备结构，并返回具有更高级别API的新对象。这个API可能还会做一些事情，例如让串口<code>new</code>函数需要<code>Clock</code>结构体的借用，这个Clock结构体只能通过调用特定函数来生成,而这个函数会配置PLL并设置时钟频率。这样在没有先配置时钟频率的情况下，就不可能创建串口对象, 否则串口对象有可能将波特率误转换为错误的时钟滴答。一些crate甚至为每个GPIO引脚可以处于的状态定义了特殊的Trait，要求用户在将引脚传递到外设之前将其置于正确的状态(例如，通过选择适当的可选功能模式)。更重要的是,这些都是零成本抽象！</p>
+<p>让我们来看一个例子：</p>
+<pre><code class="language-rust ignore">#![no_std]
+#![no_main]
+
+extern crate panic_halt; // panic handler
+
+use cortex_m_rt::entry;
+use tm4c123x_hal as hal;
+use tm4c123x_hal::prelude::*;
+use tm4c123x_hal::serial::{NewlineMode, Serial};
+use tm4c123x_hal::sysctl;
+
+#[entry]
+fn main() -&gt; ! {
+    let p = hal::Peripherals::take().unwrap();
+    let cp = hal::CorePeripherals::take().unwrap();
+
+    // Wrap up the SYSCTL struct into an object with a higher-layer API
+    let mut sc = p.SYSCTL.constrain();
+    // Pick our oscillation settings
+    sc.clock_setup.oscillator = sysctl::Oscillator::Main(
+        sysctl::CrystalFrequency::_16mhz,
+        sysctl::SystemClock::UsePll(sysctl::PllOutputFrequency::_80_00mhz),
+    );
+    // Configure the PLL with those settings
+    let clocks = sc.clock_setup.freeze();
+
+    // Wrap up the GPIO_PORTA struct into an object with a higher-layer API.
+    // Note it needs to borrow `sc.power_control` so it can power up the GPIO
+    // peripheral automatically.
+    let mut porta = p.GPIO_PORTA.split(&amp;sc.power_control);
+
+    // Activate the UART.
+    let uart = Serial::uart0(
+        p.UART0,
+        // The transmit pin
+        porta
+            .pa1
+            .into_af_push_pull::&lt;hal::gpio::AF1&gt;(&amp;mut porta.control),
+        // The receive pin
+        porta
+            .pa0
+            .into_af_push_pull::&lt;hal::gpio::AF1&gt;(&amp;mut porta.control),
+        // No RTS or CTS required
+        (),
+        (),
+        // The baud rate
+        115200_u32.bps(),
+        // Output handling
+        NewlineMode::SwapLFtoCRLF,
+        // We need the clock rates to calculate the baud rate divisors
+        &amp;clocks,
+        // We need this to power up the UART peripheral
+        &amp;sc.power_control,
+    );
+
+    loop {
+        writeln!(uart, &quot;Hello, World!\r\n&quot;).unwrap();
+    }
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../start/hardware.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../start/semihosting.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../start/hardware.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../start/semihosting.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
