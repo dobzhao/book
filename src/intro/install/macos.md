@@ -1,8 +1,8 @@
-# macOS
+# 苹果系统
 
-All the tools can be install using [Homebrew]:
+可以使用[Homebrew]安装所有工具：
 
-[Homebrew]: http://brew.sh/
+[Homebrew]:http：//brew.sh/
 
 ``` console
 $ # GDB
@@ -15,6 +15,6 @@ $ # QEMU
 $ brew install qemu
 ```
 
-That's all! Go to the [next section].
+就这样！转到[下一部分]。
 
-[next section]: verify.md
+[下一部分]:verify.md

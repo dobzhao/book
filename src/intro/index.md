@@ -1,119 +1,88 @@
-# Introduction
+# 介绍
 
-Welcome to The Embedded Rust Book: An introductory book about using the Rust
-Programming Language on "Bare Metal" embedded systems, such as Microcontrollers.
+欢迎阅读《嵌入式Rust手册》: 一本介绍使用Rust在
+“裸机”嵌入式系统(例如微控制器)上编程的入门书籍。
 
-## Who Embedded Rust is For
-Embedded Rust is for everyone who wants to do embedded programming while taking advantage of the higher-level concepts and safety guarantees the Rust language provides.
-(See also [Who Rust Is For](https://doc.rust-lang.org/book/ch00-00-introduction.html))
+## 本书的潜在读者
 
-## Scope
+本书适用于希望使用Rust提供的高级概念和安全性的嵌入式开发工程师。(另请参见[Rust的目标对象](https://doc.rust-lang.org/book/ch00-00-introduction.html))
 
-The goals of this book are:
+## 范围
 
-* Get developers up to speed with embedded Rust development. i.e. How to set
-  up a development environment.
+本书的目标是: 
 
-* Share *current* best practices about using Rust for embedded development. i.e.
-  How to best use Rust language features to write more correct embedded
-  software.
+* 使开发人员与嵌入式Rust开发同步。即如何建立开发环境。
 
-* Serve as a cookbook in some cases. e.g. How do I do mix C and Rust in a single
-  project?
+* 分享 *当前* 关于使用Rust进行嵌入式开发的最佳实践。即
+  如何最好地使用Rust语言特性来编写更正确的嵌入式系统。
 
-This book tries to be as general as possible but to make things easier for both
-the readers and the writers it uses the ARM Cortex-M architecture in all its
-examples. However, the book doesn't assume that the reader is familiar with this
-particular architecture and explains details particular to this architecture
-where required.
+* 也可以作为手册。例如如何在同一个项目中混合使用C和Rust？
 
-## Who This Book is For
-This book caters towards people with either some embedded background or some Rust background, however we believe
-everybody curious about embedded Rust programming can get something out of this book. For those without any prior knowledge
-we suggest you read the "Assumptions and Prerequisites" section and catch up on missing knowledge to get more out of the book
-and improve your reading experience. You can check out the "Other Resources" section to find resources on topics
-you might want to catch up on.
+本书试图尽可能地涵盖更多议题，但是为了既降低对读者也降低对作者的要求,本书所有的例子都针对Cortex-M架构的ARM处理器。 但是，本书并不假定读者对此处理架构非常熟悉，因此会在需要的地方解释该架构的特定细节。
 
-### Assumptions and Prerequisites
+## 这本书适合谁
+本书面向的是具有嵌入式背景或熟悉Rust语言的人，但是我们相信每个对嵌入式Rust编程感兴趣的人都可以从本书中学到一些东西。对于那些没有任何先验知识的人，我们建议您阅读[假设和先决条件](#假设和先决条件)部分，并补上缺少的知识。您可以查看[其他资源](#其他资源)部分以找到有关主题的资源。
+ 
 
-* You are comfortable using the Rust Programming Language, and have written,
-  run, and debugged Rust applications on a desktop environment. You should also
-  be familiar with the idioms of the [2018 edition] as this book targets
-  Rust 2018.
+### 假设和先决条件
 
-[2018 edition]: https://doc.rust-lang.org/edition-guide/
+* 您很习惯使用Rust编程语言， 在桌面环境上编写,运行和调试过Rust应用程序。你也应该熟悉本书针对的[2018版](https://doc.rust-lang.org/edition-guide/)语法。
+ 
+* 您可以轻松地在使用至少一种语言开发和调试嵌入式系统，例如C，C++或Ada，并且熟悉以下概念: 
+  * 交叉编译
+  * 内存映射外设
+  * 中断
+  * 通用接口，例如I2C，SPI，串行等。
 
-* You are comfortable developing and debugging embedded systems in another
-  language such as C, C++, or Ada, and are familiar with concepts such as:
-    * Cross Compilation
-    * Memory Mapped Peripherals
-    * Interrupts
-    * Common interfaces such as I2C, SPI, Serial, etc.
+### 其他资源
+如果您不熟悉上述任何内容，或者想要了解有关本书中提到的特定主题的更多信息，下面的资源可能会有所帮助。
 
-### Other Resources
-If you are unfamiliar with anything mentioned above or if you want more information about a specific topic mentioned in this book you might find some of these resources helpful.
+|主题|资源|描述
+| -------------- | ---------- | ------------- |
+|Rust| [Rust Book](https://doc.rust-lang.org/book/)|如果您对Rust尚不熟悉，我们强烈建议您阅读本书。 |
+|Rust,嵌入式| [Discovery Book](https://docs.rust-embedded.org/discovery/)|如果您从未做过任何嵌入式编程，那么本书可能是一个更好的开始|
+|Rust,嵌入式| [嵌入式Rust书架](https://docs.rust-embedded.org)|在这里，您可以找到Rust嵌入式工作组提供的其他一些资源。 |
+|Rust,嵌入式| [Embedonomicon](https://docs.rust-embedded.org/embedonomicon/)|用Rust进行嵌入式编程，细节非常棒。 |
+|Rust,嵌入式| [嵌入式常见问题解答](https://docs.rust-embedded.org/faq.html)|关于嵌入式Rust的常见问题。 |
+|中断| [中断](https://en.wikipedia.org/wiki/Interrupt)| -|
+|内存映射的IO外设| [内存映射的I/O](https://en.wikipedia.org/wiki/Memory-mapped_I/O)| -|
+| SPI，UART，RS232，USB，I2C，TTL | [有关SPI，UART和其他接口的堆栈交换](https://electronics.stackexchange.com/questions/37814/usart-uart-rs232-usb-spi-i2c-ttl-etc-what-are-all-of-these-and-how-do-th)| -|
 
-| Topic        | Resource | Description |
-|--------------|----------|-------------|
-| Rust         | [Rust Book](https://doc.rust-lang.org/book/) | If you are not yet comfortable with Rust, we highly suggest reading this book. |
-| Rust, Embedded | [Discovery Book](https://docs.rust-embedded.org/discovery/) | If you have never done any embedded programming, this book might be a better start |
-| Rust, Embedded | [Embedded Rust Bookshelf](https://docs.rust-embedded.org) | Here you can find several other resources provided by Rust's Embedded Working Group. |
-| Rust, Embedded | [Embedonomicon](https://docs.rust-embedded.org/embedonomicon/) | The nitty gritty details when doing embedded programming in Rust. |
-| Rust, Embedded | [embedded FAQ](https://docs.rust-embedded.org/faq.html) | Frequently asked questions about Rust in an embedded context. |
-| Interrupts | [Interrupt](https://en.wikipedia.org/wiki/Interrupt) | - |
-| Memory-mapped IO/Peripherals | [Memory-mapped I/O](https://en.wikipedia.org/wiki/Memory-mapped_I/O) | - |
-| SPI, UART, RS232, USB, I2C, TTL | [Stack Exchange about SPI, UART, and other interfaces](https://electronics.stackexchange.com/questions/37814/usart-uart-rs232-usb-spi-i2c-ttl-etc-what-are-all-of-these-and-how-do-th) | - |
+## 如何使用这本书
 
-## How to Use This Book
+本书通常假定您会从头到尾阅读它。后面的章节会构建在前面各章的基础上，前面的章节可能会在一个主题上点到即止，而后面的章节则会重新深入讨论该主题。
 
-This book generally assumes that you’re reading it front-to-back. Later
-chapters build on concepts in earlier chapters, and earlier chapters may
-not dig into details on a topic, revisiting the topic in a later chapter.
+本书大多数示例都基于[STM32F3DISCOVERY](http://taobao.com)开发板。这个板子基于ARM Cortex-M架构. 此架构的大多数CPU的最基本功能都是相同的，但是外设和实现细节则随供应商不同而不同，甚至同一供应商的不同系列微处理器家族之间也不尽相同。
 
-This book will be using the [STM32F3DISCOVERY] development board from
-STMicroelectronics for the majority of the examples contained within. This board
-is based on the ARM Cortex-M architecture, and while basic functionality is
-the same across most CPUs based on this architecture, peripherals and other
-implementation details of Microcontrollers are different between different
-vendors, and often even different between Microcontroller families from the same
-vendor.
+因此，为了遵循本书中的示例，我们建议购买[STM32F3DISCOVERY](http://www.st.com/en/evaluation-tools/stm32f3discovery.html)开发板
 
-For this reason, we suggest purchasing the [STM32F3DISCOVERY] development board
-for the purpose of following the examples in this book.
+ 
 
-[STM32F3DISCOVERY]: http://www.st.com/en/evaluation-tools/stm32f3discovery.html
+## 改进本书
 
-## Contributing to This Book
+本书的工作在[此存储库](https://github.com/rust-embedded/book)中，主要是由[Rust资源团队](https://github.com/rust-embedded/wg#the-resources-team)开发。
+ 
 
-The work on this book is coordinated in [this repository] and is mainly
-developed by the [resources team].
+如果您在阅读本书时遇到困难，或者发现一些本书的部分内容不够清晰或难以理解，可以在本书的[问题跟踪](https://github.com/rust-embedded/book/issues/)中进行报告。
+ 
 
-[this repository]: https://github.com/rust-embedded/book
-[resources team]: https://github.com/rust-embedded/wg#the-resources-team
+欢迎针对本书提供任何但不限于有关拼写和新内容的PR.
 
-If you have trouble following the instructions in this book or find that some
-section of the book is not clear enough or hard to follow then that's a bug and
-it should be reported in [the issue tracker] of this book.
+## 重复使用此材料
 
-[the issue tracker]: https://github.com/rust-embedded/book/issues/
+本书遵循以下许可: 
 
-Pull requests fixing typos and adding new content are very welcome!
+* 本书中包含的示例代码和独立的Cargo项目均遵循[MIT许可]和[Apache许可v2.0]的条款。
+* 本书中包含的书面散文，图片和图表均遵循[CC-BY-SA v4.0]许可条款。
 
-## Re-using this material
-
-This book is distributed under the following licenses:
-
-* The code samples and free-standing Cargo projects contained within this book are licensed under the terms of both the [MIT License] and the [Apache License v2.0].
-* The written prose, pictures and diagrams contained within this book are licensed under the terms of the Creative Commons [CC-BY-SA v4.0] license.
-
-[MIT License]: https://opensource.org/licenses/MIT
-[Apache License v2.0]: http://www.apache.org/licenses/LICENSE-2.0
+[MIT许可证]: https://opensource.org/licenses/MIT
+[Apache许可证v2.0]:http://www.apache.org/licenses/LICENSE-2.0
 [CC-BY-SA v4.0]: https://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-TL;DR: If you want to use our text or images in your work, you need to:
+TL; DR: 如果您想在工作中使用我们的文字或图片，则需要: 
 
-* Give the appropriate credit (i.e. mention this book on your slide, and provide a link to the relevant page)
-* Provide a link to the [CC-BY-SA v4.0] licence
-* Indicate if you have changed the material in any way, and make any changes to our material available under the same licence
+* 给予适当的感谢(即在幻灯片上提及此书，并提供指向相关页面的链接)
+* 提供[CC-BY-SA v4.0]许可证的链接
+* 指出您是否以任何方式更改了材料，并根据相同的许可对我们的材料进行了任何更改
 
-Also, please do let us know if you find this book useful!
+另外，如果您觉得这本书有用，请告诉我们！

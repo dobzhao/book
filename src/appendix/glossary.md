@@ -1,16 +1,14 @@
-# Appendix A: Glossary
+# 附录A：术语表
 
-The embedded ecosystem is full of different protocols, hardware components and
-vendor-specific things that use their own terms and abbreviations. This Glossary
-attempts to list them with pointers for understanding them better.
+ 
 
-Term         | Meaning
--------------|--------
-I2C          | Sometimes referred to as `I² C` or Inter-IC. It is a protocol meant for hardware communication within a single integrated circuit. See [i2c.info] for more details
-SPI          | Serial Peripheral Interface
-USART        | Universal synchronous and asynchronous receiver-transmitter
-UART         | Universal asynchronous receiver-transmitter
-FPU          | Floating-point Unit. A 'math processor' running only operations on floating-point numbers
-PAC          | Peripheral Access Crate
+术语|含义
+------------- | --------
+I2C |有时也称为`I²C`或Inter-IC。用于在单个集成电路内的硬件间通信。有关更多详细信息，请参见[i2c.info]。
+SPI |串行外设接口
+USART |通用同步和异步收发器
+UART |通用异步收发器
+FPU |浮点处理单元。进行浮点数运算的“数学处理器”
+PAC |外设访问crate
 
-[i2c.info]: https://i2c.info/
+[i2c.info]:https://i2c.info/

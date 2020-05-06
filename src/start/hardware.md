@@ -1,44 +1,34 @@
-# Hardware
+# 硬件
 
-By now you should be somewhat familiar with the tooling and the development
-process. In this section we'll switch to real hardware; the process will remain
-largely the same. Let's dive in.
+现在，您应该对工具和开发过程有所了解。在本节中，我们将切换到实际硬件,该过程将基本保持不变,让我们开始吧。
 
-## Know your hardware
+## 了解您的硬件
 
-Before we begin you need to identify some characteristics of the target device
-as these will be used to configure the project:
+在我们开始之前，您需要确定目标设备的一些特征，因为这些特征将用于配置项目：
 
-- The ARM core. e.g. Cortex-M3.
+- ARM内核。例如Cortex-M3。
 
-- Does the ARM core include an FPU? Cortex-M4**F** and Cortex-M7**F** cores do.
+- ARM内核是否包括FPU？ Cortex-M4**F**和Cortex-M7**F**内核都有FPU。
 
-- How much Flash memory and RAM does the target device have? e.g. 256 KiB of
-  Flash and 32 KiB of RAM.
+-目标设备有多少闪存和RAM？例如256 KiB的闪存和32 KiB的RAM。
 
-- Where are Flash memory and RAM mapped in the address space? e.g. RAM is
-  commonly located at address `0x2000_0000`.
+-闪存和RAM映射的地址空间在哪里？例如RAM是通常位于地址“0x2000_0000”。
 
-You can find this information in the data sheet or the reference manual of your
-device.
+通常您可以在数据手册或设备的参考手册中找到这些信息。
 
-In this section we'll be using our reference hardware, the STM32F3DISCOVERY.
-This board contains an STM32F303VCT6 microcontroller. This microcontroller has:
+在本节中，我们将使用我们的参考硬件STM32F3DISCOVERY。该开发板包含STM32F303VCT6微控制器。该微控制器具有：
 
-- A Cortex-M4F core that includes a single precision FPU
+- 一个Cortex-M4F内核，其中包括一个单精度FPU
 
-- 256 KiB of Flash located at address 0x0800_0000.
+- 闪存的256 KiB位于地址0x0800_0000。
 
-- 40 KiB of RAM located at address 0x2000_0000. (There's another RAM region but
-  for simplicity we'll ignore it).
+- 位于地址0x2000_0000的40KiBRAM。 (还有另一个RAM区域，为简单起见，我们将其忽略)。
 
-## Configuring
+## 配置
 
-We'll start from scratch with a fresh template instance. Refer to the
-[previous section on QEMU] for a refresher on how to do this without
-`cargo-generate`.
+我们将从一个新的模板实例开始。如果没有`cargo-generate`工具,请参阅[上一小节的QEMU]。
 
-[previous section on QEMU]: qemu.md
+[上一小节的QEMU]:qemu.md
 
 ``` console
 $ cargo generate --git https://github.com/rust-embedded/cortex-m-quickstart
@@ -49,7 +39,7 @@ $ cargo generate --git https://github.com/rust-embedded/cortex-m-quickstart
  $ cd app
 ```
 
-Step number one is to set a default compilation target in `.cargo/config`.
+第一个步是在.cargo/config中设置默认的编译目标。
 
 ``` console
 $ tail -n5 .cargo/config
@@ -63,10 +53,10 @@ $ tail -n5 .cargo/config
 target = "thumbv7em-none-eabihf" # Cortex-M4F and Cortex-M7F (with FPU)
 ```
 
-We'll use `thumbv7em-none-eabihf` as that covers the Cortex-M4F core.
 
-The second step is to enter the memory region information into the `memory.x`
-file.
+我们将使用`thumbv7em-none-eabihf`，因为它适合Cortex-M4F内核。
+
+第二步是将存储区域信息输入到“memory.x”文件中。
 
 ``` console
 $ cat memory.x
@@ -79,10 +69,9 @@ MEMORY
 }
 ```
 
-Make sure the `debug::exit()` call is commented out or removed, it is used
-only for running in QEMU.
+确保`debug::exit()`调用已被注释掉或删除，因为他仅用于在QEMU中运行。
 
-```rust,ignore
+```rust , ignore
 #[entry]
 fn main() -> ! {
     hprintln!("Hello, world!").unwrap();
@@ -95,34 +84,24 @@ fn main() -> ! {
 }
 ```
 
-You can now cross compile programs using `cargo build`
-and inspect the binaries using `cargo-binutils` as you did before. The
-`cortex-m-rt` crate handles all the magic required to get your chip running,
-as helpfully, pretty much all Cortex-M CPUs boot in the same fashion.
+现在，您可以像以前一样使用`cargo build`交叉编译程序，并使用`cargo-binutils`检查二进制文件。 `cortex-m-rt` crate可处理使您的芯片运行所需的所有魔术,几乎所有Cortex-M CPU都以相同的方式引导。
 
 ``` console
 $ cargo build --example hello
 ```
 
-## Debugging
+## 调试
 
-Debugging will look a bit different. In fact, the first steps can look different
-depending on the target device. In this section we'll show the steps required to
-debug a program running on the STM32F3DISCOVERY. This is meant to serve as a
-reference; for device specific information about debugging check out [the
-Debugonomicon](https://github.com/rust-embedded/debugonomicon).
+调试看起来会有所不同。实际上，根据目标设备的不同，第一步看起来可能会有所不同。在本节中，我们将介绍在STM32F3DISCOVERY上调试程序所需的步骤。有关设备的特定信息，请查看[Debugonomicon](https://github.com/rust-embedded/debugonomicon)。
 
-As before we'll do remote debugging and the client will be a GDB process. This
-time, however, the server will be OpenOCD.
+和以前一样，我们将进行远程调试，客户端是GDB进程,服务器将是OpenOCD。
 
-As done during the [verify] section connect the discovery board to your laptop /
-PC and check that the ST-LINK header is populated.
+$ cat openocd.cfg
+按照[验证]部分的操作，将开发板连接到笔记本电脑或者PC，并检查是否填充了ST-LINK接头连接器(todo ... check that the ST-LINK header is populated)。
 
-[verify]: ../intro/install/verify.md
+[验证]: ../intro/install/verify.md
 
-On a terminal run `openocd` to connect to the ST-LINK on the discovery board.
-Run this command from the root of the template; `openocd` will pick up the
-`openocd.cfg` file which indicates which interface file and target file to use.
+在终端上，运行“openocd”以连接到开发板上的ST-LINK。从模板的根目录运行此命令；`openocd`会根据`openocd.cfg`文件，找到要使用的接口文件和目标文件。
 
 ``` console
 $ cat openocd.cfg
@@ -143,9 +122,7 @@ source [find interface/stlink-v2-1.cfg]
 source [find target/stm32f3x.cfg]
 ```
 
-> **NOTE** If you found out that you have an older revision of the discovery
-> board during the [verify] section then you should modify the `openocd.cfg`
-> file at this point to use `interface/stlink-v2.cfg`.
+> **注意**如果您在[验证]部分发现开发板的版本较旧，则此时应修改`openocd.cfg`文件以使用`interface/stlink-v2.cfg`。
 
 ``` console
 $ openocd
@@ -167,13 +144,13 @@ Info : Target voltage: 2.913879
 Info : stm32f3x.cpu: hardware has 6 breakpoints, 4 watchpoints
 ```
 
-On another terminal run GDB, also from the root of the template.
+在另一个终端上，也从模板的根目录运行GDB。
 
 ``` console
 $ <gdb> -q target/thumbv7em-none-eabihf/debug/examples/hello
 ```
 
-Next connect GDB to OpenOCD, which is waiting for a TCP connection on port 3333.
+接下来，将GDB连接到OpenOCD，OpenOCD正在监听端口3333,等待新的TCP连接。
 
 ``` console
 (gdb) target remote :3333
@@ -181,8 +158,7 @@ Remote debugging using :3333
 0x00000000 in ?? ()
 ```
 
-Now proceed to *flash* (load) the program onto the microcontroller using the
-`load` command.
+现在，使用`load`命令将程序加载到微控制器上。
 
 ``` console
 (gdb) load
@@ -193,19 +169,16 @@ Start address 0x800144e, load size 10380
 Transfer rate: 17 KB/sec, 3460 bytes/write.
 ```
 
-The program is now loaded. This program uses semihosting so before we do any
-semihosting call we have to tell OpenOCD to enable semihosting. You can send
-commands to OpenOCD using the `monitor` command.
+现在程序已加载。该程序使用半主机，因此在进行任何半主机调用之前，我们必须告诉OpenOCD启用半主机。您可以使用“ monitor”将命令发送到OpenOCD。
 
 ``` console
 (gdb) monitor arm semihosting enable
 semihosting is enabled
 ```
 
-> You can see all the OpenOCD commands by invoking the `monitor help` command.
+>您可以通过调用`monitor help`命令来查看所有OpenOCD命令。
 
-Like before we can skip all the way to `main` using a breakpoint and the
-`continue` command.
+像之前一样，我们可以使用断点和`continue`跳过所有跳转到`main`函数。
 
 ``` console
 (gdb) break main
@@ -219,12 +192,10 @@ Breakpoint 1, main () at examples/hello.rs:15
 15          let mut stdout = hio::hstdout().unwrap();
 ```
 
-> **NOTE** If GDB blocks the terminal instead of hitting the breakpoint after
-> you issue the `continue` command above, you might want to double check that
-> the memory region information in the `memory.x` file is correctly set up
-> for your device (both the starts *and* lengths). 
+> **注意**如果执行`continue`命令后GDB阻塞了终端而不是停在了断点上，则可能需要仔细检查`memory.x`文件中的内存区域信息是否配置正确(起始地址和长度)。
 
-Advancing the program with `next` should produce the same results as before.
+用`next`命令替代刚刚的`continue`,应该也会产生相同的结果。
+
 
 ``` console
 (gdb) next
@@ -234,8 +205,8 @@ Advancing the program with `next` should produce the same results as before.
 19          debug::exit(debug::EXIT_SUCCESS);
 ```
 
-At this point you should see "Hello, world!" printed on the OpenOCD console,
-among other stuff.
+此时，您应该看到"Hello, world!" 打印在OpenOCD控制台上，等等。
+
 
 ``` console
 $ openocd
@@ -251,8 +222,7 @@ Info : halted: PC: 0x08000d70
 Info : halted: PC: 0x08000d72
 ```
 
-Issuing another `next` will make the processor execute `debug::exit`. This acts
-as a breakpoint and halts the process:
+发出另一个`next`将使处理器执行`debug::exit`。这充当断点并中止该过程：
 
 ``` console
 (gdb) next
@@ -261,7 +231,7 @@ Program received signal SIGTRAP, Trace/breakpoint trap.
 0x0800141a in __syscall ()
 ```
 
-It also causes this to be printed to the OpenOCD console:
+OpenOCD控制台将会打印如下内容：
 
 ``` console
 $ openocd
@@ -274,17 +244,16 @@ target halted due to breakpoint, current mode: Thread
 xPSR: 0x21000000 pc: 0x08000d76 msp: 0x20009fc0, semihosting
 ```
 
-However, the process running on the microcontroller has not terminated and you
-can resume it using `continue` or a similar command.
+但是，在微控制器上运行的进程尚未终止，您可以使用`continue`或类似命令将其恢复。
 
-You can now exit GDB using the `quit` command.
+现在，您可以使用“ quit”命令退出GDB。
 
 ``` console
 (gdb) quit
 ```
 
-Debugging now requires a few more steps so we have packed all those steps into a
-single GDB script named `openocd.gdb`.
+现在调试需要更多步骤，因此我们将所有这些步骤打包到一个名为`openocd.gdb`的GDB脚本中。
+
 
 ``` console
 $ cat openocd.gdb
@@ -309,16 +278,14 @@ load
 stepi
 ```
 
-Now running `<gdb> -x openocd.gdb $program` will immediately connect GDB to
-OpenOCD, enable semihosting, load the program and start the process.
+现在运行 `<gdb> -x openocd.gdb $program`将立即将GDB连接到OpenOCD，启用半主机，加载程序并启动该过程。
 
-Alternatively, you can turn `<gdb> -x openocd.gdb` into a custom runner to make
-`cargo run` build a program *and* start a GDB session. This runner is included
-in `.cargo/config` but it's commented out.
+您也可以将`<gdb> -x openocd.gdb`转换为自定义运行器，这样`cargo run`会自动构建程序并开始GDB会话。该运行器已包含在`.cargo/config`中，只不过现在是被注释掉的状态。
 
 ``` console
 $ head -n10 .cargo/config
 ```
+
 
 ``` toml
 [target.thumbv7m-none-eabi]

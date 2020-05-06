@@ -1,19 +1,19 @@
-## Mutable Global State
+## 全局可变状态
 
-Unfortunately, hardware is basically nothing but mutable global state, which can feel very frightening for a Rust developer. Hardware exists independently from the structures of the code we write, and can be modified at any time by the real world.
+不幸的是，硬件基本上只不过是可变的全局状态，这可能会让Rust开发人员来感到非常棘手。但是硬件本来就独立于我们编写的结构体代码，并且在现实世界中就是随时可以进行修改。
 
-## What should our rules be?
+## 我们的规则应该是什么？
 
-How can we reliably interact with these peripherals?
+我们如何与这些外围设备可靠地交互？
 
-1. Always use `volatile` methods to read or write to peripheral memory, as it can change at any time
-2. In software, we should be able to share any number of read-only accesses to these peripherals
-3. If some software should have read-write access to a peripheral, it should hold the only reference to that peripheral
+1. 始终使用`volatile`方法读取或写入外围存储器，因为它随时可能发生变化
+2. 在软件中，应该允许同时存在对这些外设的任意数量的只读访问
+3. 如果某些软件需要对外设的读写访问权限，则它应该持有该外设的唯一引用
 
-## The Borrow Checker
+## 借用检查器
 
-The last two of these rules sound suspiciously similar to what the Borrow Checker does already!
+这些规则中的最后两个听起来和借用检查器的工作机制非常类似！
 
-Imagine if we could pass around ownership of these peripherals, or offer immutable or mutable references to them?
+想像一下我们是否可以放弃这些外设的所有权，或者提供对它们的不变或可变的引用？
 
-Well, we can, but for the Borrow Checker, we need to have exactly one instance of each peripheral, so Rust can handle this correctly. Well, luckliy in the hardware, there is only one instance of any given peripheral, but how can we expose that in the structure of our code?
+好吧，我们可以. 但是对于借用检查器，我们需要每个外围设备都只有一个实例，以便Rust可以正确处理。 幸运的是，在硬件中，任何给定的外设都只有一个实例，但是如何设计访问接口呢？

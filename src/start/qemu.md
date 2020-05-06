@@ -1,48 +1,45 @@
 # QEMU
 
-We'll start writing a program for the [LM3S6965], a Cortex-M3 microcontroller.
-We have chosen this as our initial target because it [can be emulated](https://wiki.qemu.org/Documentation/Platforms/ARM#Supported_in_qemu-system-arm) using QEMU
-so you don't need to fiddle with hardware in this section and we can focus on
-the tooling and the development process.
+我们现在开始为Cortex-M3微控制器[LM3S6965]编写程序。我们选择这个作为我们的最初目标是因为它可以使用QEMU [模拟](https://wiki.qemu.org/Documentation/Platforms/ARM#Supported_in_qemu-system-arm)，因此在本节中您无需关心硬件，只需专注于工具和开发过程。
 
-[LM3S6965]: http://www.ti.com/product/LM3S6965
+[LM3S6965]:http://www.ti.com/product/LM3S6965
 
-**IMPORTANT**
-We'll use the name "app" for the project name in this tutorial.
-Whenever you see the word "app" you should replace it with the name you selected
-for your project. Or, you could also name your project "app" and avoid the
-substitutions.
+**重要**
+在本教程中，我们将名称“app”用作项目名称。每当您看到“app”一词时，都应将其替换为自己的项目名称。或者，您也可以将项目命名为“app”以避免替换。
 
-## Creating a non standard Rust program
+## 创建一个非标准的Rust程序
 
-We'll use the [`cortex-m-quickstart`] project template to generate a new
-project from it.
+我们将使用[`cortex-m-quickstart`]项目模板生成一个新项目。
 
-[`cortex-m-quickstart`]: https://github.com/rust-embedded/cortex-m-quickstart
+[`cortex-m-quickstart`]:https://github.com/rust-embedded/cortex-m-quickstart
 
-### Using `cargo-generate`
-First install cargo-generate
+### 使用`cargo-generate`
+首先安装cargo-generate
+
+
 ```console
 cargo install cargo-generate
 ```
-Then generate a new project
+
+然后生成一个新项目
+
 ```console
 cargo generate --git https://github.com/rust-embedded/cortex-m-quickstart
 ```
+
 
 ```text
  Project Name: app
  Creating project called `app`...
  Done! New project created /tmp/app
 ```
-
 ```console
 cd app
 ```
 
-### Using `git`
+### 使用`git`
 
-Clone the repository
+克隆存储库
 
 ```console
 git clone https://github.com/rust-embedded/cortex-m-quickstart app
@@ -66,9 +63,9 @@ test = false
 bench = false
 ```
 
-### Using neither
+### 手工下载
 
-Grab the latest snapshot of the `cortex-m-quickstart` template and extract it.
+获取`cortex-m-quickstart`模板的最新快照并解压缩它。
 
 ```console
 curl -LO https://github.com/rust-embedded/cortex-m-quickstart/archive/master.zip
@@ -77,17 +74,15 @@ mv cortex-m-quickstart-master app
 cd app
 ```
 
-Or you can browse to [`cortex-m-quickstart`], click the green "Clone or
-download" button and then click "Download ZIP".
+或者，您可以浏览到[`cortex-m-quickstart`]，单击绿色的“克隆或下载”按钮，然后单击“下载ZIP”。
 
-Then fill in the placeholders in the `Cargo.toml` file as done in the second
-part of the "Using `git`" version.
+然后按照“使用git”一节中的第二部分中的操作，在Cargo.toml文件中填写占位符。
 
-## Program Overview
+## 程序概述
 
-For convenience here are the most important parts of the source code in `src/main.rs`:
+为了方便起见，这是`src/main.rs`中源代码的最重要部分：
 
-```rust,ignore
+```rust , ignore
 #![no_std]
 #![no_main]
 
@@ -103,39 +98,24 @@ fn main() -> ! {
 }
 ```
 
-This program is a bit different from a standard Rust program so let's take a
-closer look.
+该程序与标准Rust程序有点不同，因此让我们仔细看一下。
 
-`#![no_std]` indicates that this program will *not* link to the standard crate,
-`std`. Instead it will link to its subset: the `core` crate.
+`#![no_std]`表示此程序*不会*链接到标准库,而是链接到其子集：`core` crate。
 
-`#![no_main]` indicates that this program won't use the standard `main`
-interface that most Rust programs use. The main (no pun intended) reason to go
-with `no_main` is that using the `main` interface in `no_std` context requires
-nightly.
+`#![no_main]`表示该程序将不使用大多数Rust程序使用的标准`main`接口。使用no_main的主要原因是在no_std上下文中使用main函数需要Rust的nightly版本。
 
-`extern crate panic_halt;`. This crate provides a `panic_handler` that defines
-the panicking behavior of the program. We will cover this in more detail in the
-[Panicking](panicking.md) chapter of the book.
+`extern crate panic_halt;`。这个crate提供了一个 `panic_handler`，它定义了程序的恐慌行为。我们将在本书的[Panicking](panicking.md)一章中对此进行详细介绍。
 
-[`#[entry]`][entry] is an attribute provided by the [`cortex-m-rt`] crate that's used
-to mark the entry point of the program. As we are not using the standard `main`
-interface we need another way to indicate the entry point of the program and
-that'd be `#[entry]`.
+[`#[entry]`][entry]是[`cortex-m-rt`]crate提供的属性，用于标记程序的入口点。由于我们没有使用标准的“ main”接口，因此需要另一种方式来指示程序的入口点，即 `#[entry]`。
 
-[entry]: https://docs.rs/cortex-m-rt-macros/latest/cortex_m_rt_macros/attr.entry.html
-[`cortex-m-rt`]: https://crates.io/crates/cortex-m-rt
+[entry]:https://docs.rs/cortex-m-rt-macros/latest/cortex_m_rt_macros/attr.entry.html
+[`cortex-m-rt`]:https://crates.io/crates/cortex-m-rt
 
-`fn main() -> !`. Our program will be the *only* process running on the target
-hardware so we don't want it to end! We use a [divergent function](https://doc.rust-lang.org/rust-by-example/fn/diverging.html) (the `-> !`
-bit in the function signature) to ensure at compile time that'll be the case.
+注意main函数的签名是`fn main() -> !` ,因为我们的程序将是目标硬件上唯一的程序，所以我们不希望它结束​​！我们使用[发散函数](https://doc.rust-lang.org/rust-by-example/fn/diverging.html)(函数签名中的`->！`表示没有返回值)来在编译时确保main不会结束。
 
-## Cross compiling
+## 交叉编译
 
-The next step is to *cross* compile the program for the Cortex-M3 architecture.
-That's as simple as running `cargo build --target $TRIPLE` if you know what the
-compilation target (`$TRIPLE`) should be. Luckily, the `.cargo/config` in the
-template has the answer:
+下一步是交叉编译针对Cortex-M3架构的程序。如果您知道编译目标($TRIPLE)应该是什么，那就直接运行`cargo build --target $ TRIPLE`。不知道也没关系,模板项目中的.cargo/config里有答案：
 
 ```console
 tail -n6 .cargo/config
@@ -150,30 +130,26 @@ target = "thumbv7m-none-eabi"    # Cortex-M3
 # target = "thumbv7em-none-eabihf" # Cortex-M4F and Cortex-M7F (with FPU)
 ```
 
-To cross compile for the Cortex-M3 architecture we have to use
-`thumbv7m-none-eabi`. This compilation target has been set as the default so the
-two commands below do the same:
+为了针对Cortex-M3架构进行交叉编译，我们必须使用`thumbv7m-none-eabi`。该编译目标已设置为默认目标，因此以下两个命令具有相同的功能：
 
 ```console
 cargo build --target thumbv7m-none-eabi
 cargo build
 ```
 
-## Inspecting
+## 检查
 
-Now we have a non-native ELF binary in `target/thumbv7m-none-eabi/debug/app`. We
-can inspect it using `cargo-binutils`.
+现在我们在`target/thumbv7m-none-eabi/debug/app`中有一个非本地的ELF二进制文件。我们可以使用`cargo-binutils`检查它。
 
-With `cargo-readobj` we can print the ELF headers to confirm that this is an ARM
-binary.
+使用`cargo-readobj`，我们可以打印ELF头以确认这是一个ARM二进制文件。
 
 ``` console
 cargo readobj --bin app -- -file-headers
 ```
 
-Note that:
-* `--bin app` is sugar for inspect the binary at `target/$TRIPLE/debug/app`
-* `--bin app` will also (re)compile the binary, if necessary
+注意：
+*`--bin app`是用于检查``target/$TRIPLE/debug/app`这个二进制文件
+*`--bin app`还会在必要时(重新)编译二进制文件
 
 
 ``` text
@@ -199,15 +175,18 @@ ELF Header:
   Section header string table index: 18
 ```
 
-`cargo-size` can print the size of the linker sections of the binary.
+`cargo-size`可以打印二进制文件的链接器部分的大小。
 
-> **NOTE** this output assumes that rust-embedded/cortex-m-rt#111 has been
-> merged
+> **注意**此输出假定已经合并了rust-embedd/cortex-m-rt111
+!todo 这句话啥意思啊?
+
 
 ```console
 cargo size --bin app --release -- -A
 ```
-we use `--release` to inspect the optimized version
+
+我们使用`--release`检查优化过的版本
+
 
 ``` text
 app  :
@@ -231,33 +210,24 @@ section             size        addr
 Total              14570
 ```
 
-> A refresher on ELF linker sections
+>关于ELF链接器部分的复习
 >
-> - `.text` contains the program instructions
-> - `.rodata` contains constant values like strings
-> - `.data` contains statically allocated variables whose initial values are
->   *not* zero
-> - `.bss` also contains statically allocated variables whose initial values
->   *are* zero
-> - `.vector_table` is a *non*-standard section that we use to store the vector
->   (interrupt) table
-> - `.ARM.attributes` and the `.debug_*` sections contain metadata and will
->   *not* be loaded onto the target when flashing the binary.
+>- `.text`包含程序说明
+>- `.rodata`包含常量值，例如字符串
+>- `.data`包含静态分配的变量，其初始值为非零
+>- `.bss`也包含静态分配的变量，其初始值为零
+>- `.vector_table`是非标准部分,用于存储中断向量表
+>- `.ARM.attributes`和`.debug_ *`部分包含元数据，这部分数据不会写入目标开发板的flash上。
 
-**IMPORTANT**: ELF files contain metadata like debug information so their *size
-on disk* does *not* accurately reflect the space the program will occupy when
-flashed on a device. *Always* use `cargo-size` to check how big a binary really
-is.
+**重要**：ELF文件包含诸如调试信息之类的元数据，因此它们在磁盘上的大小不会准确地反映程序在设备上真实占用的空间,因此应该总是使用`cargo-size`来检查二进制文件的真正大小。
 
-`cargo-objdump` can be used to disassemble the binary.
+`cargo-objdump` 可用于反汇编二进制文件。
 
 ```console
 cargo objdump --bin app --release -- -disassemble -no-show-raw-insn -print-imm-hex
 ```
 
-> **NOTE** this output can differ on your system. New versions of rustc, LLVM
-> and libraries can generate different assembly. We truncated some of the instructions
-> to keep the snippet small.
+> **注意**此输出在您的系统上可能会有所不同。 不同版本的rustc，LLVM和库都会生成不同的程序集。另外,由于空间问题,我们也对内容做了删减。
 
 ```text
 app:  file format ELF32-arm-little
@@ -298,14 +268,13 @@ HardFault:
      663: <unknown>
 ```
 
-## Running
+## 运行
 
-Next, let's see how to run an embedded program on QEMU! This time we'll use the
-`hello` example which actually does something.
+接下来，让我们看看如何在QEMU上运行嵌入式程序！这次，我们将使用`hello`示例。
 
-For convenience here's the source code of `examples/hello.rs`:
+为了方便起见，这是`examples/hello.rs`的源代码：
 
-```rust,ignore
+```rust , ignore
 //! Prints "Hello, world!" on the host console using semihosting
 
 #![no_main]
@@ -328,20 +297,17 @@ fn main() -> ! {
 }
 ```
 
-This program uses something called semihosting to print text to the *host*
-console. When using real hardware this requires a debug session but when using
-QEMU this Just Works.
+该程序使用一种称为半主机(semihosting)的方式将文本打印到*host*控制台。在使用实际硬件时，这需要调试会话支持，但是在使用QEMU时，直接使用就行了。
 
-Let's start by compiling the example:
+让我们从编译示例开始：
 
 ```console
 cargo build --example hello
 ```
 
-The output binary will be located at
-`target/thumbv7m-none-eabi/debug/examples/hello`.
+输出二进制文件将位于`target/thumbv7m-none-eabi/debug/examples/hello`。
 
-To run this binary on QEMU run the following command:
+要在QEMU上运行此二进制文件，请运行以下命令：
 
 ```console
 qemu-system-arm \
@@ -356,8 +322,7 @@ qemu-system-arm \
 Hello, world!
 ```
 
-The command should successfully exit (exit code = 0) after printing the text. On
-*nix you can check that with the following command:
+打印文本后，该命令应成功退出退出代码为0)。在*nix上，您可以使用以下命令进行检查：
 
 ```console
 echo $?
@@ -367,32 +332,21 @@ echo $?
 0
 ```
 
-Let's break down that QEMU command:
+让我们分解一下QEMU命令：
 
-- `qemu-system-arm`. This is the QEMU emulator. There are a few variants of
-  these QEMU binaries; this one does full *system* emulation of *ARM* machines
-  hence the name.
+-`qemu-system-arm` 这是QEMU仿真器。QEMU支持很多不同架构的处理。从名字可以看出,这是ARM处理器的完整仿真。
 
-- `-cpu cortex-m3`. This tells QEMU to emulate a Cortex-M3 CPU. Specifying the
-  CPU model lets us catch some miscompilation errors: for example, running a
-  program compiled for the Cortex-M4F, which has a hardware FPU, will make QEMU
-  error during its execution.
+-`-cpu cortex-m3`。这告诉QEMU模拟Cortex-M3 CPU。指定CPU型号可以让我们捕获一些错误编译错误：例如，运行针对具有硬件FPU的Cortex-M4F编译的程序，QEMU将在其运行期间产生错误。
 
-- `-machine lm3s6965evb`. This tells QEMU to emulate the LM3S6965EVB, a
-  evaluation board that contains a LM3S6965 microcontroller.
+-`-machine lm3s6965evb`。这告诉QEMU模拟LM3S6965EVB，这是一个包含LM3S6965微控制器的开发板。
 
-- `-nographic`. This tells QEMU to not launch its GUI.
+-`-nographic`。这告诉QEMU不要启动其GUI。
 
-- `-semihosting-config (..)`. This tells QEMU to enable semihosting. Semihosting
-  lets the emulated device, among other things, use the host stdout, stderr and
-  stdin and create files on the host.
+-`-semihosting-config(..)`。这告诉QEMU启用半主机。半主机使仿真设备可以使用主机stdout，stderr和stdin并在主机上创建文件。
 
-- `-kernel $file`. This tells QEMU which binary to load and run on the emulated
-  machine.
+-`-kernel $file`。这告诉QEMU在模拟机上加载并运行哪个二进制文件。
 
-Typing out that long QEMU command is too much work! We can set a custom runner
-to simplify the process. `.cargo/config` has a commented out runner that invokes
-QEMU; let's uncomment it:
+输入这么长的QEMU命令太麻烦了！我们可以设置一个自定义运行器以简化过程。`.cargo/config`有一行启动 QEMU的运行器被注释掉了,让我们去掉这行注释：
 
 ```console
 head -n3 .cargo/config
@@ -404,9 +358,7 @@ head -n3 .cargo/config
 runner = "qemu-system-arm -cpu cortex-m3 -machine lm3s6965evb -nographic -semihosting-config enable=on,target=native -kernel"
 ```
 
-This runner only applies to the `thumbv7m-none-eabi` target, which is our
-default compilation target. Now `cargo run` will compile the program and run it
-on QEMU:
+该运行器仅适用于`thumbv7m-none-eabi`目标，这是我们的默认编译目标。现在直接运行`cargo run`就会编译程序并在QEMU上运行：
 
 ```console
 cargo run --example hello --release
@@ -419,21 +371,17 @@ cargo run --example hello --release
 Hello, world!
 ```
 
-## Debugging
+## 调试
 
-Debugging is critical to embedded development. Let's see how it's done.
+调试对于嵌入式开发至关重要。让我们看看它是如何完成的。
 
-Debugging an embedded device involves *remote* debugging as the program that we
-want to debug won't be running on the machine that's running the debugger
-program (GDB or LLDB).
+调试嵌入式设备涉及远程调试，因为要调试的程序不会在运行调试器程序(GDB或LLDB)的计算机上运行。
 
-Remote debugging involves a client and a server. In a QEMU setup, the client
-will be a GDB (or LLDB) process and the server will be the QEMU process that's
-also running the embedded program.
+远程调试涉及客户端和服务器。针对QEMU，客户端将是GDB(或LLDB)进程，而服务器将是运行嵌入式程序的QEMU进程。
 
-In this section we'll use the `hello` example we already compiled.
+在本节中，我们将使用已经编译的“ hello”示例。
 
-The first debugging step is to launch QEMU in debugging mode:
+调试的第一步是在调试模式下启动QEMU：
 
 ```console
 qemu-system-arm \
@@ -446,29 +394,22 @@ qemu-system-arm \
   -kernel target/thumbv7m-none-eabi/debug/examples/hello
 ```
 
-This command won't print anything to the console and will block the terminal. We
-have passed two extra flags this time:
+此命令不会在控制台上显示任何内容，并且会阻塞终端。这次我们额外传递了两个参数：
 
-- `-gdb tcp::3333`. This tells QEMU to wait for a GDB connection on TCP
-  port 3333.
+- `-gdb tcp::3333`。这告诉QEMU监听TCP端口3333,等待GDB的连接。
 
-- `-S`. This tells QEMU to freeze the machine at startup. Without this the
-  program would have reached the end of main before we had a chance to launch
-  the debugger!
+- `-S` 这告诉QEMU在启动时冻结计算机。没有这个，可能我们还没有来得及启动调试器,程序就已经结束了！
 
-Next we launch GDB in another terminal and tell it to load the debug symbols of
-the example:
+接下来，我们在另一个终端中启动GDB，并告诉它加载示例的调试符号：
+
 
 ```console
 gdb-multiarch -q target/thumbv7m-none-eabi/debug/examples/hello
 ```
 
-**NOTE**: you might need another version of gdb instead of `gdb-multiarch` depending
-on which one you installed in the installation chapter. This could also be
-`arm-none-eabi-gdb` or just `gdb`.
+**注意**：您可能需要其他版本的gdb而不是`gdb-multiarch`，具体取决于在安装一章中你安装的版本。也可能是`arm-none-eabi-gdb`或直接是`gdb`。
 
-Then within the GDB shell we connect to QEMU, which is waiting for a connection
-on TCP port 3333.
+然后在GDB Shell中，我们连接到QEMU，它正在TCP端口3333上等待连接。
 
 ```console
 target remote :3333
@@ -480,12 +421,9 @@ Reset () at $REGISTRY/cortex-m-rt-0.6.1/src/lib.rs:473
 473     pub unsafe extern "C" fn Reset() -> ! {
 ```
 
-You'll see that the process is halted and that the program counter is pointing
-to a function named `Reset`. That is the reset handler: what Cortex-M cores
-execute upon booting.
+您会看到该进程已停止，并且程序计数器指向了一个名为“ Reset”的函数。那就是重启入口：即Cortex-M启动时执行程序的入口。
 
-This reset handler will eventually call our main function. Let's skip all the
-way there using a breakpoint and the `continue` command:
+该函数最终将调用我们的main函数。让我们使用断点和`continue`命令一路跳过：
 
 ```console
 break main
@@ -506,8 +444,7 @@ Breakpoint 1, main () at examples/hello.rs:17
 17          let mut stdout = hio::hstdout().unwrap();
 ```
 
-We are now close to the code that prints "Hello, world!". Let's move forward
-using the `next` command.
+我们现在接近打印“ Hello，world！”的代码。让我们继续使用“ next”命令。
 
 ``` console
 next
@@ -525,15 +462,15 @@ next
 20          debug::exit(debug::EXIT_SUCCESS);
 ```
 
-At this point you should see "Hello, world!" printed on the terminal that's
-running `qemu-system-arm`.
+此时，您应该在运行`qemu-system-arm`的终端上看到"Hello, world!"。
 
 ```text
 $ qemu-system-arm (..)
 Hello, world!
 ```
 
-Calling `next` again will terminate the QEMU process.
+再次调用`next`将终止QEMU过程。
+
 
 ```console
 next
@@ -543,7 +480,7 @@ next
 [Inferior 1 (Remote target) exited normally]
 ```
 
-You can now exit the GDB session.
+现在，您可以退出GDB会话。
 
 ``` console
 quit

@@ -1,26 +1,25 @@
-# Verify Installation
+# 验证安装
 
-In this section we check that some of the required tools / drivers have been
-correctly installed and configured.
+在本节中，我们检查是否已正确安装和配置了一些必需的工具/驱动程序。
 
-Connect your laptop / PC to the discovery board using a micro USB cable. The
-discovery board has two USB connectors; use the one labeled "USB ST-LINK" that
-sits on the center of the edge of the board.
+使用微型USB电缆将开发板连接到笔记本电脑/PC。开发板有两个USB接口。请使用位于板边缘中央的标有“USB ST-LINK”的USB接口。
 
-Also check that the ST-LINK header is populated. See the picture below; the
-ST-LINK header is circled in red.
+还要检查是否已拔掉ST-LINK跳线。见下图； ST-LINK标头用红色圈出。
 
 <p align="center">
 <img title="Connected discovery board" src="../../assets/verify.jpeg">
 </p>
 
-Now run the following command:
+
+现在运行以下命令:
 
 ``` console
 $ openocd -f interface/stlink-v2-1.cfg -f target/stm32f3x.cfg
 ```
 
-You should get the following output and the program should block the console:
+
+您应该获得以下输出，并且该程序应阻塞控制台:
+
 
 ``` text
 Open On-Chip Debugger 0.10.0
@@ -41,30 +40,22 @@ Info : Target voltage: 2.919881
 Info : stm32f3x.cpu: hardware has 6 breakpoints, 4 watchpoints
 ```
 
-The contents may not match exactly but you should get the last line about
-breakpoints and watchpoints. If you got it then terminate the OpenOCD process
-and move to the [next section].
+内容可能不完全匹配，但是您应该看到有关断点和观察点的最后一行。如果看到了，则终止OpenOCD进程并移至[下一部分]。
 
-[next section]: ../../start/index.md
+[下一部分]: ../../start/index.md
 
-If you didn't get the "breakpoints" line then try the following command.
+如果没有得到“断点”行，请尝试以下命令。
 
 ``` console
 $ openocd -f interface/stlink-v2.cfg -f target/stm32f3x.cfg
 ```
 
-If that command works that means you got an old hardware revision of the
-discovery board. That won't be a problem but commit that fact to memory as
-you'll need to configure things a bit differently later on. You can move to the
-[next section].
+如果该命令有效，则说明您的开发板的硬件版本较旧。这虽然不是一个问题，但是请记住你稍后需要对配置做一些修改。现在您可以转到[下一部分]。
 
-If neither command worked as a normal user then try to run them with root
-permission (e.g. `sudo openocd ..`). If the commands do work with root
-permission then check that the [udev rules] have been correctly set.
+如果这两个命令都不能作为普通用户使用，请尝试以root权限运行它们（例如`sudo openocd ..`）。如果这时可以正常工作，则请检查[udev规则]是否已正确设置。
 
-[udev rules]: linux.md#udev-rules
+[udev规则]:linux.md# udev-rules
 
-If you have reached this point and OpenOCD is not working please open [an issue]
-and we'll help you out!
+如果您到了这一步，OpenOCD无法正常工作，请提交一个[问题]，我们将为您提供帮助！
 
-[an issue]: https://github.com/rust-embedded/book/issues
+[问题]:https://github.com/rust-embedded/book/issues

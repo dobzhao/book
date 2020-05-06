@@ -1,9 +1,9 @@
-# Typestate Programming
+# 类型状态机(TypesState)编程
 
-The concept of [typestates] describes the encoding of information about the current state of an object into the type of that object. Although this can sound a little arcane, if you have used the [Builder Pattern] in Rust, you have already started using Typestate Programming!
+[typestates]就是通过对象的类型来表示对象的状态信息。尽管这听起来有些不可思议，但是如果您在Rust中使用了[建造者模式]，那么您已经开始使用类型状态机了. 
 
-[typestates]: https://en.wikipedia.org/wiki/Typestate_analysis
-[Builder Pattern]: https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
+[typestates]:https://en.wikipedia.org/wiki/Typestate_analysis
+[建造者模式]:https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
 
 ```rust
 pub mod foo_module {
@@ -49,17 +49,17 @@ fn main() {
 }
 ```
 
-In this example, there is no direct way to create a `Foo` object. We must create a `FooBuilder`, and properly initialize it before we can obtain the `Foo` object we want.
+在这个例子中，没有直接的方法来创建一个`Foo`对象。我们必须创建一个`FooBuilder`并正确地对其进行初始化，然后才能获得所需的`Foo`对象。
 
-This minimal example encodes two states:
+这个最小的示例对两种状态进行编码：
 
-* `FooBuilder`, which represents an "unconfigured", or "configuration in process" state
-* `Foo`, which represents a "configured", or "ready to use" state.
+* `FooBuilder`，代表“未配置”或“正在配置”状态
+* `Foo`，表示“已配置”或“准备使用”状态。
 
-## Strong Types
+## 强类型
 
-Because Rust has a [Strong Type System], there is no easy way to magically create an instance of `Foo`, or to turn a `FooBuilder` into a `Foo` without calling the `into_foo()` method. Additionally, calling the `into_foo()` method consumes the original `FooBuilder` structure, meaning it can not be reused without the creation of a new instance.
+由于Rust具有[强类型系统]，因此没有简单的方法直接创建`Foo`实例，或将`FooBuilder`转换为`Foo`而无需调用`into_foo()`方法。另外，调用`into_foo()`方法会消耗原始的`FooBuilder`对象，这意味着如果不创建新实例就无法重用它。
 
-[Strong Type System]: https://en.wikipedia.org/wiki/Strong_and_weak_typing
+[强类型系统]: https://en.wikipedia.org/wiki/Strong_and_weak_typing
 
-This allows us to represent the states of our system as types, and to include the necessary actions for state transitions into the methods that exchange one type for another. By creating a `FooBuilder`, and exchanging it for a `Foo` object, we have walked through the steps of a basic state machine.
+这使我们可以将系统的状态表示为类型，并将状态转换所必需的动作包括在将一种类型转换换为另一种类型的方法中。通过创建一个 `FooBuilder`，并将其转换为一个`Foo`对象，我们实现了最基本的状态机。

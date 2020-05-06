@@ -2,9 +2,7 @@
 
 ## `arm-none-eabi-gdb`
 
-ARM provides `.exe` installers for Windows. Grab one from [here][gcc], and follow the instructions.
-Just before the installation process finishes tick/select the "Add path to environment variable"
-option. Then verify that the tools are in your `%PATH%`:
+ARM为Windows提供exe安装程序。从[gcc]这里下载，然后按照说明进行操作。在安装过程即将完成之前，勾选“Add path to environment variable”选项。然后验证工具是否在您的“％PATH％”中：
 
 ``` console
 $ arm-none-eabi-gdb -v
@@ -12,19 +10,15 @@ GNU gdb (GNU Tools for Arm Embedded Processors 7-2018-q2-update) 8.1.0.20180315-
 (..)
 ```
 
-[gcc]: https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
+[gcc]:https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
 
 ## OpenOCD
 
-There's no official binary release of OpenOCD for Windows but there are unofficial releases
-available [here][openocd]. Grab the 0.10.x zipfile and extract it somewhere on your drive (I
-recommend `C:\OpenOCD` but with the drive letter that makes sense to you) then update your `%PATH%`
-environment variable to include the following path: `C:\OpenOCD\bin` (or the path that you used
-before).
+没有适用于Windows的OpenOCD官方二进制发行版，但是[这里](https://github.com/gnu-mcu-eclipse/openocd/releases)有非官方发行版。下载0.10.x zip文件，并将其解压缩到驱动器上的某个位置(我建议使用C:\OpenOCD)，然后更新`％PATH％`环境变量，使其包含以下路径：`C:\OpenOCD\bin`(或之前选择的路径)。
+ 
 
-[openocd]: https://github.com/gnu-mcu-eclipse/openocd/releases
+使用以下命令验证OpenOCD是否在您的“％PATH％”中：
 
-Verify that OpenOCD is in your `%PATH%` with:
 
 ``` console
 $ openocd -v
@@ -32,19 +26,17 @@ Open On-Chip Debugger 0.10.0
 (..)
 ```
 
+
 ## QEMU
 
-Grab QEMU from [the official website][qemu].
+从[官方网站](https://www.qemu.org/download/#windows)下载QEMU。
+ 
+## ST-LINK USB驱动程序
 
-[qemu]: https://www.qemu.org/download/#windows
+您还需要安装[此USB驱动程序],否则OpenOCD无法正常工作。按照安装程序的说明进行操作，并确保您安装了正确版本的驱动程序(32位或64位)。
 
-## ST-LINK USB driver
+[此USB驱动程序]:http://www.st.com/en/embedded-software/stsw-link009.html
 
-You'll also need to install [this USB driver] or OpenOCD won't work. Follow the installer
-instructions and make sure you install the right version (32-bit or 64-bit) of the driver.
+就这样！转到[下一部分]。
 
-[this USB driver]: http://www.st.com/en/embedded-software/stsw-link009.html
-
-That's all! Go to the [next section].
-
-[next section]: verify.md
+[下一部分]:verify.md

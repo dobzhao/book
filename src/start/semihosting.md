@@ -1,18 +1,12 @@
-# Semihosting
+# 半主机
 
-Semihosting is a mechanism that lets embedded devices do I/O on the host and is
-mainly used to log messages to the host console. Semihosting requires a debug
-session and pretty much nothing else (no extra wires!) so it's super convenient
-to use. The downside is that it's super slow: each write operation can take
-several milliseconds depending on the hardware debugger (e.g. ST-Link) you use.
+半主机是这样一种机制，它允许嵌入式设备在主机上执行I/O操作，主要用于将消息记录到主机控制台。半主机除了需要调试会话之外，几乎不需要其他任何操作(不需要额外的接线！)，因此使用起来超级方便。缺点是它非常慢：根据您使用的硬件调试器不同(例如ST-Link)，每个写入操作可能要花费几毫秒。
 
-The [`cortex-m-semihosting`] crate provides an API to do semihosting operations
-on Cortex-M devices. The program below is the semihosting version of "Hello,
-world!":
+[`cortex-m-semihosting`]crate提供了一个API，可以在Cortex-M设备上进行半主机操作。下面的程序是“ Hello，world！”的半主机版本：
 
-[`cortex-m-semihosting`]: https://crates.io/crates/cortex-m-semihosting
+[`cortex-m-semihosting`]:https://crates.io/crates/cortex-m-semihosting
 
-```rust,ignore
+```rust , ignore
 #![no_main]
 #![no_std]
 
@@ -29,8 +23,7 @@ fn main() -> ! {
 }
 ```
 
-If you run this program on hardware you'll see the "Hello, world!" message
-within the OpenOCD logs.
+如果您在硬件上运行此程序，则会在OpenOCD日志中看到"Hello, world!" 消息。
 
 ``` console
 $ openocd
@@ -39,17 +32,14 @@ Hello, world!
 (..)
 ```
 
-You do need to enable semihosting in OpenOCD from GDB first:
+您需要先从GDB中启用OpenOCD的半主机：
+
 ``` console
 (gdb) monitor arm semihosting enable
 semihosting is enabled
 ```
 
-QEMU understands semihosting operations so the above program will also work with
-`qemu-system-arm` without having to start a debug session. Note that you'll
-need to pass the `-semihosting-config` flag to QEMU to enable semihosting
-support; these flags are already included in the `.cargo/config` file of the
-template.
+QEMU能够理解半主机操作，因此上述程序也可以与`qemu-system-arm`一起使用，而无需启动调试会话。注意，您需要将`-semihosting-config`参数传递给QEMU以启用半主机支持。这些参数已经包含在模板的`cargo/config`文件中。
 
 ``` console
 $ # this program will block the terminal
@@ -58,12 +48,10 @@ $ cargo run
 Hello, world!
 ```
 
-There's also an `exit` semihosting operation that can be used to terminate the
-QEMU process. Important: do **not** use `debug::exit` on hardware; this function
-can corrupt your OpenOCD session and you will not be able to debug more programs
-until you restart it.
+还有一个`exit`半主机操作可用于终止QEMU进程。重要提示：不要在硬件上使用`debug::exit`；此功能可能会破坏您的OpenOCD会话，并且只有重新启动它才能调试更多程序。
 
-```rust,ignore
+
+```rust , ignore
 #![no_main]
 #![no_std]
 
@@ -94,14 +82,11 @@ $ echo $?
 1
 ```
 
-One last tip: you can set the panicking behavior to `exit(EXIT_FAILURE)`. This
-will let you write `no_std` run-pass tests that you can run on QEMU.
+最后一个提示：您可以将恐慌行为设置为`exit(EXIT_FAILURE)`。这将使您编写可以在QEMU上运行的`no_std`测试案例。
 
-For convenience, the `panic-semihosting` crate has an "exit" feature that when
-enabled invokes `exit(EXIT_FAILURE)` after logging the panic message to the host
-stderr.
+为方便起见，`panic-semihosting`crate具有“退出”功能，启用后，会将panic消息记录到主机stderr后调用`exit(EXIT_FAILURE)`。
 
-```rust,ignore
+```rust , ignore
 #![no_main]
 #![no_std]
 
@@ -131,15 +116,12 @@ $ echo $?
 1
 ```
 
-**NOTE**: To enable this feature on `panic-semihosting`, edit your
-`Cargo.toml` dependencies section where `panic-semihosting` is specified with:
+**注意**：要在`panic-semihosting`上启用此功能，请在您的`Cargo.toml`依赖项部分中编辑`panic-semihosting`：
 
 ``` toml
 panic-semihosting = { version = "VERSION", features = ["exit"] }
 ```
 
-where `VERSION` is the version desired. For more information on dependencies
-features check the [`specifying dependencies`] section of the Cargo book.
+其中`VERSION` 是所需的版本。有关依赖项功能的更多信息，请参阅《Cargo手册》中的[`specifying dependencies`]部分。
 
-[`specifying dependencies`]:
-https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html
+[`specifying dependencies`]:https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html

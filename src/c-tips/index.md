@@ -1,37 +1,24 @@
-# Tips for embedded C developers
+# 嵌入式C开发人员的技巧
 
-This chapter collects a variety of tips that might be useful to experienced
-embedded C developers looking to start writing Rust. It will especially
-highlight how things you might already be used to in C are different in Rust.
+本章收集了各种技巧，这些技巧对于希望开始编写Rust的经验丰富的嵌入式C开发人员可能有用。它特别强调了您可能已经在C语言中习惯的事情在Rust中的不同之处。
 
-## Preprocessor
+## 预处理器
 
-In embedded C it is very common to use the preprocessor for a variety of
-purposes, such as:
+在C语言中，预处理器有多种用途，例如：
 
-* Compile-time selection of code blocks with `#ifdef`
-* Compile-time array sizes and computations
-* Macros to simplify common patterns (to avoid function call overhead)
+* #ifdef在编译时选择代码块
+* 编译时数组大小和计算
+* 宏可简化常见模式(避免函数调用开销)
 
-In Rust there is no preprocessor, and so many of these use cases are addressed
-differently. In the rest of this section we cover various alternatives to
-using the preprocessor.
+Rust没有预处理器，因此许多用例的处理方式有所不同。在本节的其余部分，我们将介绍预处理器的各种替代方法。
 
-### Compile-Time Code Selection
+### 编译时代码选择
 
-The closest match to `#ifdef ... #endif` in Rust are [Cargo features]. These
-are a little more formal than the C preprocessor: all possible features are
-explicitly listed per crate, and can only be either on or off. Features are
-turned on when you list a crate as a dependency, and are additive: if any crate
-in your dependency tree enables a feature for another crate, that feature will
-be enabled for all users of that crate.
+在Rust中，与#ifdef ... #endif最接近的匹配项是[Cargo features]。这比C预处理器更加正式：每个crate都明确列出了所有可能的特性(features)，并且只能打开或关闭。当您将一个crate作为依赖项列出时,特性已经被打开：如果您的依赖关系树中的任何crate为另一个板条箱启用了某个特性，则该crate的这个特性在所有的crate中都会启用。
 
-[Cargo features]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section
+[Cargo features]:https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section
 
-For example, you might have a crate which provides a library of signal
-processing primitives. Each one might take some extra time to compile or
-declare some large table of constants which you'd like to avoid. You could
-declare a Cargo feature for each component in your `Cargo.toml`:
+例如，您要实现一个提供信号处理原语的crate,你想避免每个人都编译或者声明一个巨大的常量表。您可以在`Cargo.toml`中为每个组件声明一个Cargo特性：
 
 ```toml
 [features]
@@ -39,7 +26,8 @@ FIR = []
 IIR = []
 ```
 
-Then, in your code, use `#[cfg(feature="FIR")]` to control what is included.
+然后，在您的代码中使用`#[cfg(feature="FIR")]`来控制包含的内容。
+
 
 ```rust
 /// In your top-level lib.rs
@@ -51,29 +39,17 @@ pub mod fir;
 pub mod iir;
 ```
 
-You can similarly include code blocks only if a feature is _not_ enabled, or if
-any combination of features are or are not enabled.
 
-Additionally, Rust provides a number of automatically-set conditions you can
-use, such as `target_arch` to select different code based on architecture. For
-full details of the conditional compilation support, refer to the
-[conditional compilation] chapter of the Rust reference.
+同样包含某个代码块的条件可以是只有某个特性未启用,或者某些特性组合启用或者未启用。
 
-[conditional compilation]: https://doc.rust-lang.org/reference/conditional-compilation.html
+另外，Rust提供了许多可以自动使用的条件，例如`target_arch`可以根据架构选择不同的代码。有关条件编译支持的完整详细信息，请参见Rust手册的[条件编译]一章。
 
-The conditional compilation will only apply to the next statement or block. If
-a block can not be used in the current scope then the `cfg` attribute will
-need to be used multiple times.  It's worth noting that most of the time it is
-better to simply include all the code and allow the compiler to remove dead
-code when optimising: it's simpler for you and your users, and in general the
-compiler will do a good job of removing unused code.
+[条件编译]:https://doc.rust-lang.org/reference/conditional-compilation.html
 
-### Compile-Time Sizes and Computation
+条件编译仅适用于下一条语句或块。如果是多条语句或者多个代码块，那么`cfg`属性需要多次使用。值得注意的是，在大多数情况下，包含所有代码并允许编译器在优化时删除无效代码会更好：对于您和您的用户来说更简单，并且通常来说，编译器会很好地删除未使用的代码。
 
-Rust supports `const fn`, functions which are guaranteed to be evaluable at
-compile-time and can therefore be used where constants are required, such as
-in the size of arrays. This can be used alongside features mentioned above,
-for example:
+### 编译时大小和计算
+Rust支持`const fn`，这些函数保证在编译时可以求值，因此可以在需要常量的地方使用，例如数组大小。可以与上述功能一起使用，例如：
 
 ```rust
 const fn array_size() -> usize {
@@ -86,83 +62,48 @@ const fn array_size() -> usize {
 static BUF: [u32; array_size()] = [0u32; array_size()];
 ```
 
-These are new to stable Rust as of 1.31, so documentation is still sparse. The
-functionality available to `const fn` is also very limited at the time of
-writing; in future Rust releases it is expected to expand on what is permitted
-in a `const fn`.
+这些新特性刚刚在Rust 1.31版本稳定下来，因此文档仍然很少。在编写本文时，`const fn`可用的功能非常有限。在将来的Rust版本中，有望扩展`const fn`允许的范围。
 
-### Macros
+### 宏
 
-Rust provides an extremely powerful [macro system]. While the C preprocessor
-operates almost directly on the text of your source code, the Rust macro system
-operates at a higher level. There are two varieties of Rust macro: _macros by
-example_ and _procedural macros_. The former are simpler and most common; they
-look like function calls and can expand to a complete expression, statement,
-item, or pattern. Procedural macros are more complex but permit extremely
-powerful additions to the Rust language: they can transform arbitrary Rust
-syntax into new Rust syntax.
+Rust提供了非常强大的[宏系统]。相比C预处理器几乎直接在源代码的文本上运行，Rust宏系统在更高级别上运行。 Rust宏有两种类型：声明宏和过程宏。前者更简单也最常见；宏看起来像函数调用，并且可以扩展为完整的表达式，语句，项目或模式。过程宏更加复杂，但是功能也更强大,它可以将任意Rust语法转换为新的Rust语法。
 
-[macro system]: https://doc.rust-lang.org/book/ch19-06-macros.html
+[宏系统]:https://doc.rust-lang.org/book/ch19-06-macros.html
 
-In general, where you might have used a C preprocessor macro, you probably want
-to see if a macro-by-example can do the job instead. They can be defined in
-your crate and easily used by your own crate or exported for other users. Be
-aware that since they must expand to complete expressions, statements, items,
-or patterns, some use cases of C preprocessor macros will not work, for example
-a macro that expands to part of a variable name or an incomplete set of items
-in a list.
+通常，在使用C预处理器宏的地方，您可以试试用声明宏来替代。它们可以在您的crate中定义，既可以自己使用,也可以导出让其他crate使用。请注意，由于它们必须扩展为完整的表达式，语句，项目或模式，因此某些C预处理器宏的用例将无法替代，例如，宏展开后是变量名的一部分或list的部分子集。
 
-As with Cargo features, it is worth considering if you even need the macro. In
-many cases a regular function is easier to understand and will be inlined to
-the same code as a macro. The `#[inline]` and `#[inline(always)]` [attributes]
-give you further control over this process, although care should be taken here
-as well — the compiler will automatically inline functions from the same crate
-where appropriate, so forcing it to do so inappropriately might actually lead
-to decreased performance.
+与Cargo特性一样，是否需要宏也值得考虑。在许多情况下，常规函数更易于理解，并且内联可以起到与宏相同的效果。 `#[inline]`和`#[inline(always)]` [属性]可以更准确的控制是否内联，此处也应格外小心--编译器会在适当的情况下自动内联同一crate中的函数，因此，强迫它执行不当操作可能会导致性能下降。
 
-[attributes]: https://doc.rust-lang.org/reference/attributes.html#inline-attribute
+[属性]:https://doc.rust-lang.org/reference/attributes.html#inline-attribute
 
-Explaining the entire Rust macro system is out of scope for this tips page, so
-you are encouraged to consult the Rust documentation for full details.
+解释整个Rust宏系统超出了本书的范围，因此，建议您查阅Rust文档以获取全部详细信息。
 
-## Build System
+## 构建系统
 
-Most Rust crates are built using Cargo (although it is not required). This
-takes care of many difficult problems with traditional build systems. However,
-you may wish to customise the build process. Cargo provides [`build.rs`
-scripts] for this purpose. They are Rust scripts which can interact with the
-Cargo build system as required.
+大多数Rust crate都是使用Cargo构建的(尽管不是必需的)。这可以解决传统构建系统中的许多难题。但是，您可能希望自定义构建过程。 Cargo为此提供了[build.rs脚本]。它们是Rust脚本，可以根据需要与Cargo构建系统进行交互。
 
-[`build.rs` scripts]: https://doc.rust-lang.org/cargo/reference/build-scripts.html
+[build.rs脚本]:https://doc.rust-lang.org/cargo/reference/build-scripts.html
 
-Common use cases for build scripts include:
+构建脚本的常见用例包括：
 
-* provide build-time information, for example statically embedding the build
-  date or Git commit hash into your executable
-* generate linker scripts at build time depending on selected features or other
-  logic
-* change the Cargo build configuration
-* add extra static libraries to link against
+* 提供构建时信息，例如将构建日期或Git commit哈希静态嵌入到可执行文件中
+* 在构建时根据所选功能或其他逻辑生成链接脚本
+* 更改Cargo构建配置
+* 添加额外的静态链接库
 
-At present there is no support for post-build scripts, which you might
-traditionally have used for tasks like automatic generation of binaries from
-the build objects or printing build information.
+当前，不支持构建后脚本，传统上您可能会使用这些脚本来完成诸如从构建对象自动生成二进制文件或打印构建信息之类的任务。
 
-### Cross-Compiling
+### 交叉编译
 
-Using Cargo for your build system also simplifies cross-compiling. In most
-cases it suffices to tell Cargo `--target thumbv6m-none-eabi` and find a
-suitable executable in `target/thumbv6m-none-eabi/debug/myapp`.
+将Cargo用于您的构建系统还可以简化交叉编译。在大多数情况下，只需告诉Cargo `--target thumbv6m-none-eabi`，就可以在`target/thumbv6m-none-eabi/debug/myapp`中找到生成的可执行文件。
 
-For platforms not natively supported by Rust, you will need to build `libcore`
-for that target yourself. On such platforms, [Xargo] can be used as a stand-in
-for Cargo which automatically builds `libcore` for you.
+对于Rust不直接支持的平台，您将需要自己构建`libcore`。在这样的平台上，[Xargo]可用作Cargo的替代品，它会自动为您构建`libcore`。
 
 [Xargo]: https://github.com/japaric/xargo
 
-## Iterators vs Array Access
+## 迭代器与数组
 
-In C you are probably used to accessing arrays directly by their index:
+在C语言中，您可能习惯于通过数组的索引直接访问数组：
 
 ```c
 int16_t arr[16];
@@ -172,70 +113,46 @@ for(i=0; i<sizeof(arr)/sizeof(arr[0]); i++) {
 }
 ```
 
-In Rust this is an anti-pattern: indexed access can be slower (as it needs to
-be bounds checked) and may prevent various compiler optimisations. This is an
-important distinction and worth repeating: Rust will check for out-of-bounds
-access on manual array indexing to guarantee memory safety, while C will
-happily index outside the array.
+在Rust中，这是一种反模式：索引访问可能较慢(因为需要对边界进行检查)，并且可能阻止各种编译器优化。这是一个重要的区别，值得重复：Rust将检查数组的越界访问，以确保内存安全，而C将愉快地接受越界访问。
 
-Instead, use iterators:
+所以，请使用迭代器：
 
-```rust,ignore
+```rust , ignore
 let arr = [0u16; 16];
 for element in arr.iter() {
     process(*element);
 }
 ```
 
-Iterators provide a powerful array of functionality you would have to implement
-manually in C, such as chaining, zipping, enumerating, finding the min or max,
-summing, and more. Iterator methods can also be chained, giving very readable
-data processing code.
+迭代器提供了一系列强大的在C中必须手动实现的功能，例如链式调用，zip，枚举，查找最小值或最大值，求和等等。迭代器方法可以链式调用以提高代码的可读性。
 
-See the [Iterators in the Book] and [Iterator documentation] for more details.
+有关更多详细信息，请参见[Rust book中的迭代器]和[迭代器文档]。
 
-[Iterators in the Book]: https://doc.rust-lang.org/book/ch13-02-iterators.html
-[Iterator documentation]: https://doc.rust-lang.org/core/iter/trait.Iterator.html
+[Rust book中的迭代器]:https://doc.rust-lang.org/book/ch13-02-iterators.html
+[迭代器文档]:https://doc.rust-lang.org/core/iter/trait.Iterator.html
 
-## References vs Pointers
+## 引用与指针
 
-In Rust, pointers (called [_raw pointers_]) exist but are only used in specific
-circumstances, as dereferencing them is always considered `unsafe` -- Rust
-cannot provide its usual guarantees about what might be behind the pointer.
+在Rust中，指针(称为[裸指针])仅在特定情况下使用，因为对它们的解引用始终被认为是“不安全的”(`unsafe`)-Rust无法为其指向的内容提供通常的保证。
 
-[_raw pointers_]: https://doc.rust-lang.org/book/ch19-01-unsafe-rust.html#dereferencing-a-raw-pointer
+[裸指针]:https://doc.rust-lang.org/book/ch19-01-unsafe-rust.html#dereferencing-a-raw-pointer
 
-In most cases, we instead use _references_, indicated by the `&` symbol, or
-_mutable references_, indicated by `&mut`. References behave similarly to
-pointers, in that they can be dereferenced to access the underlying values, but
-they are a key part of Rust's ownership system: Rust will strictly enforce that
-you may only have one mutable reference _or_ multiple non-mutable references to
-the same value at any given time.
+在大多数情况下，我们改为使用由`&`符号表示的引用或由`&mut`符号表示的可变引用。引用的行为与指针相似，因为它们可以被解引用以访问指向的值，但是它们是Rust所有权系统的关键部分：Rust严格要求您任何时候只能拥有一个可变引用或多个非可变引用。
 
-In practice this means you have to be more careful about whether you need
-mutable access to data: where in C the default is mutable and you must be
-explicit about `const`, in Rust the opposite is true.
+在实践中，这意味着您必须更加小心是否需要对数据进行可变访问：在C中，默认值是可变的，而对于`const`则必须明确，在Rust中则相反。
 
-One situation where you might still use raw pointers is interacting directly
-with hardware (for example, writing a pointer to a buffer into a DMA peripheral
-register), and they are also used under the hood for all peripheral access
-crates to allow you to read and write memory-mapped registers.
+有一种情况,您可能只能使用裸指针,那就是与硬件直接打交道(例如，将指向缓冲区的指针写入DMA外设寄存器). 并且所有外设访问crate底层用得也是裸指针，从而可以读写内存映射寄存器。
 
-## Volatile Access
+## 易失性(volatile)访问
 
-In C, individual variables may be marked `volatile`, indicating to the compiler
-that the value in the variable may change between accesses. Volatile variables
-are commonly used in an embedded context for memory-mapped registers.
+在C语言中，各个变量可以标记为 `volatile`，告诉编译器变量中的值可能在两次访问之间改变。`volatile`变量通常在嵌入式系统中用于内存映射寄存器的访问。
 
-In Rust, instead of marking a variable as `volatile`, we use specific methods
-to perform volatile access: [`core::ptr::read_volatile`] and
-[`core::ptr::write_volatile`]. These methods take a `*const T` or a `*mut T`
-(_raw pointers_, as discussed above) and perform a volatile read or write.
+在Rust中，我们不是使用volatile来标记变量，而是使用特定的方法来实现volatile访问：[`core::ptr::read_volatile`]和[`core::ptr::write_volatile`]。这些方法使用`*const T` 或`*mut T`(如上所述的裸指针)作为参数来执行易失性读取或写入。
 
-[`core::ptr::read_volatile`]: https://doc.rust-lang.org/core/ptr/fn.read_volatile.html
-[`core::ptr::write_volatile`]: https://doc.rust-lang.org/core/ptr/fn.write_volatile.html
+[`core::ptr::read_volatile`]:https://doc.rust-lang.org/core/ptr/fn.read_volatile.html
+[`core::ptr::write_volatile`]:https://doc.rust-lang.org/core/ptr/fn.write_volatile.html
 
-For example, in C you might write:
+例如，在C中，您这样写：
 
 ```c
 volatile bool signalled = false;
@@ -257,9 +174,9 @@ void driver() {
 }
 ```
 
-The equivalent in Rust would use volatile methods on each access:
+Rust中的等效代码是在每次访问时使用volatile方法：
 
-```rust,ignore
+```rust , ignore
 static mut SIGNALLED: bool = false;
 
 #[interrupt]
@@ -282,32 +199,19 @@ fn driver() {
 }
 ```
 
-A few things are worth noting in the code sample:
-  * We can pass `&mut SIGNALLED` into the function requiring `*mut T`, since
-    `&mut T` automatically converts to a `*mut T` (and the same for `*const T`)
-  * We need `unsafe` blocks for the `read_volatile`/`write_volatile` methods,
-    since they are `unsafe` functions. It is the programmer's responsibility
-    to ensure safe use: see the methods' documentation for further details.
+示例代码中需要注意以下几点：
+  * 我们可以将`&mut SIGNALLED`传递到需要`*mut T`的write_volatile中，因为`&mut T`会自动转换为`*mut T`(`&T`自动转换为`*const T`)。
+  * 对于`read_volatile`/`write_volatile`方法，我们需要使用unsafe块，因为它们是unsafe函数。确保安全地使用这两个函数是程序员的责任：更多详细信息，请参见这两个方法的文档。
 
-It is rare to require these functions directly in your code, as they will
-usually be taken care of for you by higher-level libraries. For memory mapped
-peripherals, the peripheral access crates will implement volatile access
-automatically, while for concurrency primitives there are better abstractions
-available (see the [Concurrency chapter]).
+很少直接在您的代码中需要这些功能，因为更高级别的crate通常会为您处理这些功能。对于内存映射的外围设备，外围设备访问crate将自动实现易失性访问，而对于并发原语，则可以使用更好的抽象(请参见[并发章节])。
 
-[Concurrency chapter]: ../concurrency/index.md
+[并发章节]:../concurrency/index.md
 
-## Packed and Aligned Types
+## 内存对齐
 
-In embedded C it is common to tell the compiler a variable must have a certain
-alignment or a struct must be packed rather than aligned, usually to meet
-specific hardware or protocol requirements.
+在嵌入式C语言中，通常告诉编译器变量必须具有一定的对齐方式，或者必须打包而不是对齐结构体，这通常是为了满足特定的硬件或协议要求。
 
-In Rust this is controlled by the `repr` attribute on a struct or union. The
-default representation provides no guarantees of layout, so should not be used
-for code that interoperates with hardware or C. The compiler may re-order
-struct members or insert padding and the behaviour may change with future
-versions of Rust.
+在Rust中，这是由结构体或联合的`repr`属性控制。默认表示形式不保证布局，因此不在与硬件或C互操作的代码中使用。编译器可能会重新排序结构体成员或插入填充，而编译器的这些行为可能会在Rust以后的版本中发生改变。
 
 ```rust
 struct Foo {
@@ -325,7 +229,7 @@ fn main() {
 // Note ordering has been changed to x, z, y to improve packing.
 ```
 
-To ensure layouts that are interoperable with C, use `repr(C)`:
+为了确保布局可以和C互操作，请使用 `repr(C)`：
 
 ```rust
 #[repr(C)]
@@ -345,7 +249,7 @@ fn main() {
 // `z` is two-byte aligned so a byte of padding exists between `y` and `z`.
 ```
 
-To ensure a packed representation, use `repr(packed)`:
+为了确保紧凑内存布局(一字节对齐)，请使用 `repr(packed)`：
 
 ```rust
 #[repr(packed)]
@@ -365,10 +269,9 @@ fn main() {
 // No padding has been inserted between `y` and `z`, so now `z` is unaligned.
 ```
 
-Note that using `repr(packed)` also sets the alignment of the type to `1`.
+注意，使用`repr(packed)`还将类型的对齐方式设置为一字节。
 
-Finally, to specify a specific alignment, use `repr(align(n))`, where `n` is
-the number of bytes to align to (and must be a power of two):
+最后，要指定特定的对齐方式，请使用`repr(align(n))`，其中`n`是要对齐的字节数(必须为2的幂)：
 
 ```rust
 #[repr(C)]
@@ -392,21 +295,18 @@ fn main() {
 // evidenced by the `000` at the end of their addresses.
 ```
 
-Note we can combine `repr(C)` with `repr(align(n))` to obtain an aligned and
-C-compatible layout. It is not permissible to combine `repr(align(n))` with
-`repr(packed)`, since `repr(packed)` sets the alignment to `1`. It is also not
-permissible for a `repr(packed)` type to contain a `repr(align(n))` type.
 
-For further details on type layouts, refer to the [type layout] chapter of the
-Rust Reference.
+注意，我们可以将 `repr(C)`与`repr(align(n))`结合使用以获得对齐并兼容C的布局。不允许将`repr(align(n))`与`repr(packed)`结合使用，因为`repr(packed)`将对齐方式设置为1。
 
-[type layout]: https://doc.rust-lang.org/reference/type-layout.html
+有关类型布局的更多详细信息，请参见Rust参考中的[类型布局]一章。
 
-## Other Resources
+[类型布局]:https://doc.rust-lang.org/reference/type-layout.html
 
-* In this book:
-    * [A little C with your Rust](../interoperability/c-with-rust.md)
-    * [A little Rust with your C](../interoperability/rust-with-c.md)
-* [The Rust Embedded FAQs](https://docs.rust-embedded.org/faq.html)
-* [Rust Pointers for C Programmers](http://blahg.josefsipek.net/?p=580)
+## 其他资源
+
+*本书中的：
+  * [带有Rust的C](../interoperability/rust-with-c.md)
+  * [C语言有点锈](../interoperability/rust-with-c.md)
+* [嵌入式Rust常见问题解答](https://docs.rust-embedded.org/faq.html)
+* [C程序员的Rust指针](http://blahg.josefsipek.net/?p=580)
 * [I used to use pointers - now what?](https://github.com/diwic/reffers-rs/blob/master/docs/Pointers.md)

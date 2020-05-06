@@ -1,44 +1,44 @@
-# Peripherals
+# 外设
 
-## What are Peripherals?
+## 什么是外围设备？
 
-Most Microcontrollers have more than just a CPU, RAM, or Flash Memory - they contain sections of silicon which are used for interacting with systems outside of the microcontroller, as well as directly and indirectly interacting with their surroundings in the world via sensors, motor controllers, or human interfaces such as a display or keyboard. These components are collectively known as Peripherals.
+大多数微控制器都是SoC,不仅仅具有CPU，RAM或闪存，芯片内部还集成了各种设备,用于与外部系统进行交互. 比如通过传感器，电机控制器直接或间接与周围环境进行交互。 或其他的人机界面，例如显示器或键盘。这些组件统称为外围设备。
 
-These peripherals are useful because they allow a developer to offload processing to them, avoiding having to handle everything in software. Similar to how a desktop developer would offload graphics processing to a video card, embedded developers can offload some tasks to peripherals allowing the CPU to spend its time doing something else important, or doing nothing in order to save power.
+这些外围设备很有用，因为它们使开发人员可以将一部分工作分派出去，而不必全部由软件来实现。与台式机开发人员将图形处理任务分派给显卡的方式类似，嵌入式开发人员可以将某些任务分派到外围设备，从而使CPU可以将时间花在更重要的事情上，或者不做任何事以节省功耗。
 
-If you look at the main circuit board in an old-fashioned home computer from the 1970s or 1980s (and actually, the desktop PCs of yesterday are not so far removed from the embedded systems of today) you would expect to see:
+如果您看一下1970年代或1980年代的老式家用计算机中的主板(实际上，以前的台式机与今天的嵌入式系统相去不远)，您会看到：
 
-* A processor
-* A RAM chip
-* A ROM chip
-* An I/O controller
+* 处理器
+* RAM芯片
+* ROM芯片
+* I/O控制器
 
-The RAM chip, ROM chip and I/O controller (the peripheral in this system) would be joined to the processor through a series of parallel traces known as a 'bus'. This bus carries address information, which selects which device on the bus the processor wishes to communicate with, and a data bus which carries the actual data. In our embedded microcontrollers, the same principles apply - it's just that everything is packed on to a single piece of silicon.
+RAM芯片，ROM芯片和I/O控制器(此系统中的外围设备)通过“总线”连接到处理器。处理器通过地址总线选择与哪个设备进行通信，通过数据总线传输数据。在我们的嵌入式微控制器中，原理都是一样的-只是将所有内容包装在一块芯片内。
 
-However, unlike graphics cards, which typically have a Software API like Vulkan, Metal, or OpenGL, peripherals are exposed to our Microcontroller with a hardware interface, which is mapped to a chunk of the memory.
+但是与显卡不同的是,显卡一般提供了像Vulkan，Metal或OpenGL之类的软件API，而嵌入式外设通过内存映射的方式,直接将硬件接口暴露给我们的微控制器。
 
-## Linear and Real Memory Space
+## 线性和物理内存地址空间
 
-On a microcontroller, writing some data to some other arbitrary address, such as `0x4000_0000` or `0x0000_0000`, may also be a completely valid action.
+在微控制器上，将一些数据写入任意地址，例如`0x4000_0000`或`0x0000_0000`，也可能是完全有效的操作。
 
-On a desktop system, access to memory is tightly controlled by the MMU, or Memory Management Unit. This component has two major responsibilities: enforcing access permission to sections of memory (preventing one process from reading or modifying the memory of another process); and re-mapping segments of the physical memory to virtual memory ranges used in software. Microcontrollers do not typically have an MMU, and instead only use real physical addresses in software.
+在台式机系统上，对内存的访问由内存管理单元(MMU)严格控制,MMU有两个主要职责：强制执行对内存的访问权限(防止一个进程读取或修改另一进程的内存)；并将物理内存的地址重新映射到软件中使用的虚拟内存地址。微控制器通常没有MMU，而仅使用实际物理地址。
 
-Although 32 bit microcontrollers have a real and linear address space from `0x0000_0000`, and `0xFFFF_FFFF`, they generally only use a few hundred kilobytes of that range for actual memory. This leaves a significant amount of address space remaining. In earlier chapters, we were talking about RAM being located at address `0x2000_0000`. If our RAM was 64 KiB long (i.e. with a maximum address of 0xFFFF) then addresses `0x2000_0000` to `0x2000_FFFF` would correspond to our RAM. When we write to a variable which lives at address `0x2000_1234`, what happens internally is that some logic detects the upper portion of the address (0x2000 in this example) and then activates the RAM so that it can act upon the lower portion of the address (0x1234 in this case). On a Cortex-M we also have our Flash ROM mapped in at address `0x0000_0000` up to, say, address `0x0007_FFFF` (if we have a 512 KiB Flash ROM). Rather than ignore all remaining space between these two regions, Microcontroller designers instead mapped the interface for peripherals in certain memory locations. This ends up looking something like this:
+尽管32位微控制器具有从0x0000_0000到0xFFFF_FFFF的物理和线性地址空间，但它们通常仅使用该范围的几百K字节作为实际内存。这留下了大量的可用地址空间。在前面的章节中，我们讨论了位于地址“0x2000_0000”上的RAM。如果我们的RAM大小为64 KiB(即最大地址为0xFFFF)，则地址“0x2000_0000”到“0x2000_FFFF”将对应于我们的RAM。当我们写入位于地址“0x2000_1234”的变量时， 某些逻辑检测地址的上半部分(在此示例中为0x2000)，然后激活RAM，由RAM来处理地址的下半部分(在这种情况下为0x1234)。在Cortex-M上，我们将Flash ROM映射到地址“0x0000_0000”到地址“0x0007_FFFF”之间(如果我们有512 KiB Flash ROM)。微控制器设计人员没有忽略这两个区域之间的剩余地址空间，而是将某些内存位置映射给了外设。最终看起来像这样：
 
 ![](../assets/nrf52-memory-map.png)
 
-[Nordic nRF52832 Datasheet (pdf)]
+[Nordic nRF52832手册(pdf)]
 
-## Memory Mapped Peripherals
+## 内存映射的外围设备
 
-Interaction with these peripherals is simple at a first glance - write the right data to the correct address. For example, sending a 32 bit word over a serial port could be as direct as writing that 32 bit word to a certain memory address. The Serial Port Peripheral would then take over and send out the data automatically.
+乍看之下，与这些外设的交互非常简单-将正确的数据写入正确的地址。例如，通过串行端口发送32位字可能与将32位字写入某个内存地址一样直接。然后，串行端口外围设备将接管并自动发送数据。
 
-Configuration of these peripherals works similarly. Instead of calling a function to configure a peripheral, a chunk of memory is exposed which serves as the hardware API. Write `0x8000_0000` to a SPI Frequency Configuration Register, and the SPI port will send data at 8 Megabits per second. Write `0x0200_0000` to the same address, and the SPI port will send data at 125 Kilobits per second. These configuration registers look a little bit like this:
+这些外设的配置工作类似。无需调用函数来进行配置一个外设，而是公开了一块用作硬件API的内存区域。比如将“0x8000_0000”写入SPI频率配置寄存器，SPI端口将以每秒8兆位的速度发送数据。将“0x0200_0000”写入相同的地址，SPI端口将以每秒125 Kilobits的速度发送数据。这些配置寄存器看起来像这样：
 
 ![](../assets/nrf52-spi-frequency-register.png)
 
-[Nordic nRF52832 Datasheet (pdf)]
+[Nordic nRF52832手册(pdf)]
 
-This interface is how interactions with the hardware are made, no matter what language is used, whether that language is Assembly, C, or Rust.
+无论使用哪种语言，无论该语言是Assembly，C还是Rust，该接口都是与硬件进行交互的方式。
 
-[Nordic nRF52832 Datasheet (pdf)]: http://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.1.pdf
+[Nordic nRF52832手册(pdf)]: http://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.1.pdf

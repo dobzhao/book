@@ -1,27 +1,30 @@
-# Memory Mapped Registers
+# 内存映射寄存器
 
-Embedded systems can only get so far by executing normal Rust code and moving data around in RAM. If we want to get any information into or out of our system (be that blinking an LED, detecting a button press or communicating with an off-chip peripheral on some sort of bus) we're going to have to dip into the world of Peripherals and their 'memory mapped registers'.
+就目前我们所知,嵌入式系统只能执行常规的Rust代码,操作内存中的数据(todo: 什么样的系统不是这样?)。如果我们想获取或者修改系统的任何信息(例如，闪烁LED，检测到按钮的按下或与某种总线上的外设进行通信)，我们将不得不深入了解外设及其“内存映射寄存器”。
 
-You may well find that the code you need to access the peripherals in your micro-controller has already been written, at one of the following levels:
+现在已经存在不少问外设的crate,他们可以大致进行如下分类:
 
-* Micro-architecture Crate - This sort of crate handles any useful routines common to the processor core your microcontroller is using, as well as any peripherals that are common to all micro-controllers that use that particular type of processor core. For example the [cortex-m] crate gives you functions to enable and disable interrupts, which are the same for all Cortex-M based micro-controllers. It also gives you access to the 'SysTick' peripheral included with all Cortex-M based micro-controllers.
-* Peripheral Access Crate (PAC) - This sort of crate is a thin wrapper over the various memory-wrapper registers defined for your particular part-number of micro-controller you are using. For example, [tm4c123x] for the Texas Instruments Tiva-C TM4C123 series, or [stm32f30x] for the ST-Micro STM32F30x series. Here, you'll be interacting with the registers directly, following each peripheral's operating instructions given in your micro-controller's Technical Reference Manual.
-* HAL Crate - These crates offer a more user-friendly API for your particular processor, often by implementing some common traits defined in [embedded-hal]. For example, this crate might offer a `Serial` struct, with a constructor that takes an appropriate set of GPIO pins and a baud rate, and offers some sort of `write_byte` function for sending data. See the chapter on [Portability] for more information on [embedded-hal].
-* Board Crate - These crates go one step further than a HAL Crate by pre-configuring various peripherals and GPIO pins to suit the specific developer kit or board you are using, such as [F3] for the STM32F3DISCOVERY board.
+* 处理器架构相关Crate (Micro-architecture Crate) - 这种crate比较通用, 可处理CPU相关的通用例程以及一些通用外设。例如，[cortex-m]crate为您提供了启用和禁用中断的功能，这些功能对于所有基于Cortex-M的CPU都是相同的。它还使您可以访问所有基于Cortex-M的微控制器附带的时钟外设(SysTick)。
 
-[cortex-m]: https://crates.io/crates/cortex-m
-[tm4c123x]: https://crates.io/crates/tm4c123x
-[stm32f30x]: https://crates.io/crates/stm32f30x
-[embedded-hal]: https://crates.io/crates/embedded-hal
-[Portability]: ../portability/index.md
-[F3]: https://crates.io/crates/f3
+* 外设相关Crate(PAC)-这种crate实际上是对特定CPU型号的内存映射寄存器的一个简单封装。例如，[tm4c123x]这个crate是对德州仪器(TI)Tiva-C TM4C123系列CPU的封装，[stm32f30x]这个crate是对ST-Micro STM32F30x系列CPU的封装。借助他们，您可以按照CPU参考手册中给出的每个外设的操作说明直接与寄存器进行交互。
+
+* HAL crate - 这些crate通过实现[embedded-hal]中定义的一些常见Trait，来提供更友好的处理器相关API。例如，此crate可能提供一个`Serial`结构体，该结构体提供一个构造函数来配置一组GPIO引脚和波特率，并提供某种`write_byte`函数来发送数据。有关[embedded-hal]的更多信息，请参见[可移植性]一章。
+
+*开发板相关crate - 通过预先配置各种外设和GPIO引脚以适合特定的开发板，例如针对TM32F3DISCOVERY开发板的[F3]crate，这些crate相比HAL类crate,更易用。
+
+[cortex-m]:https：//crates.io/crates/cortex-m
+[tm4c123x]:https://crates.io/crates/tm4c123x
+[stm32f30x]:https://crates.io/crates/stm32f30x
+[embedded-hal]:https://crates.io/crates/embedded-hal
+[可移植性]:../portability/index.md
+[F3]:https://crates.io/crates/f3
 
 
-## Starting at the bottom
+## 从底层开始
 
-Let's look at the SysTick peripheral that's common to all Cortex-M based micro-controllers. We can find a pretty low-level API in the [cortex-m] crate, and we can use it like this:
+让我们看一下所有基于Cortex-M的微控制器共有的SysTick外设。我们可以在[cortex-m]crate中找到一个相当低级的API，我们可以像这样使用它：
 
-```rust,ignore
+```rust , ignore
 use cortex_m::peripheral::{syst, Peripherals};
 use cortex_m_rt::entry;
 
@@ -41,15 +44,15 @@ fn main() -> ! {
 }
 ```
 
-The functions on the `SYST` struct map pretty closely to the functionality defined by the ARM Technical Reference Manual for this peripheral. There's nothing in this API about 'delaying for X milliseconds' - we have to crudely implement that ourselves using a `while` loop. Note that we can't access our `SYST` struct until we have called `Peripherals::take()` - this is a special routine that guarantees that there is only one `SYST` structure in our entire program. For more on that, see the [Peripherals] section.
+SYST结构上的函数接口与ARM技术参考手册为此外围设备定义的功能非常接近。这个API中没有“延迟X毫秒”这样的函数接口,因此我们必须使用`while`循环来实现它。注意，在调用 `Peripherals::take()`之前，我们无法访问`SYST`结构体-这可确保整个程序中只有一个`SYST`实例。有关更多信息，请参见[外围设备]部分。
 
-[Peripherals]: ../peripherals/index.md
+[外围设备]:../peripherals/index.md
 
-## Using a Peripheral Access Crate (PAC)
+## 使用外设crate(PAC)
 
-We won't get very far with our embedded software development if we restrict ourselves to only the basic peripherals included with every Cortex-M. At some point, we're going to need to write some code that's specific to the particular micro-controller we're using. In this example, let's assume we have an Texas Instruments TM4C123 - a middling 80MHz Cortex-M4 with 256 KiB of Flash. We're going to pull in the [tm4c123x] crate to make use of this chip.
+如果我们将自己限制在每个Cortex-M附带的基本外围设备上，那么我们在嵌入式软件开发方面就不会走得太远。总有一天，我们需要编写一些特定于我们正在使用的特定微控制器的代码。在此示例中，假设我们使用德州仪器(TI)TM4C123这款款处理器(具有256 KiB Flash,80MHz的Cortex-M4)。我们需要[tm4c123x]这个crate以使用此芯片。
 
-```rust,ignore
+```rust , ignore
 #![no_std]
 #![no_main]
 
@@ -76,35 +79,36 @@ pub fn init() -> (Delay, Leds) {
 
 ```
 
-We've accessed the `PWM0` peripheral in exactly the same way as we accessed the `SYST` peripheral earlier, except we called `tm4c123x::Peripherals::take()`. As this crate was auto-generated using [svd2rust], the access functions for our register fields take a closure, rather than a numeric argument. While this looks like a lot of code, the Rust compiler can use it to perform a bunch of checks for us, but then generate machine-code which is pretty close to hand-written assembler! Where the auto-generated code isn't able to determine that all possible arguments to a particular accessor function are valid (for example, if the SVD defines the register as 32-bit but doesn't say if some of those 32-bit values have a special meaning), then the function is marked as `unsafe`. We can see this in the example above when setting the `load` and `compa` sub-fields using the `bits()` function.
+除了调用`tm4c123x::Peripherals::take()`之外，我们访问PWM0外设的方式与之前访问SYST外设的方式完全相同。由于此crate是使用[svd2rust]自动生成的，因此我们寄存器的访问函数采用闭包而不是数字参数。尽管这看起来有很多代码，但是Rust编译器可以为我们执行一堆检查以及优化，然后生成与手写汇编代码非常接近的机器代码！自动生成的代码如果无法确定特定访问器函数的参数的所有可能值均有效(例如，SVD将寄存器定义为32位整数，但实际上只有其中的某些值才有特殊含义,才有意义)，则该函数被标记为“不安全”。我们在上面的示例中使用`bits()` 函数设置 `load` 和`compa` 子字段时可以看到这一点。
 
-### Reading
+### 读访问
 
-The `read()` function returns an object which gives read-only access to the various sub-fields within this register, as defined by the manufacturer's SVD file for this chip. You can find all the functions available on special `R` return type for this particular register, in this particular peripheral, on this particular chip, in the [tm4c123x documentation][tm4c123x documentation R].
+ `read()` 函数返回一个对象R，该对象只有对该寄存器中各个子字段的只读访问权限，这些权限由制造商的该芯片的SVD文件定义。R上面定义的所有函数功能,您可以在[tm4c123x文档] [tm4c123x文档R]中找到针对此款处理器,此种外设的具体寄存器的定义。
 
-```rust,ignore
+
+```rust , ignore
 if pwm.ctl.read().globalsync0().is_set() {
     // Do a thing
 }
 ```
 
-### Writing
+### 写访问
 
-The `write()` function takes a closure with a single argument. Typically we call this `w`. This argument then gives read-write access to the various sub-fields within this register, as defined by the manufacturer's SVD file for this chip. Again, you can find all the functions available on the 'w' for this particular register, in this particular peripheral, on this particular chip, in the [tm4c123x documentation][tm4c123x Documentation W]. Note that all of the sub-fields that we do not set will be set to a default value for us - any existing content in the register will be lost.
+ `write()`函数采用一个带有单个参数的闭包。通常我们将其称为 `w`。根据制造商关于此芯片的SVD文件，此参数可对该寄存器内的各个子字段进行读写访问。同样，`w`上面定义 所有函数功能,您可以在[tm4c123x文档] [tm4c123x文档W]中找到针对此处理器,此外设的具体寄存器的定义。请注意，我们未设置的所有子字段都将被设置默认值-寄存器中的任何现有内容都将丢失。
 
-```rust,ignore
+```rust , ignore
 pwm.ctl.write(|w| w.globalsync0().clear_bit());
 ```
 
-### Modifying
+### 修改
 
-If we wish to change only one particular sub-field in this register and leave the other sub-fields unchanged, we can use the `modify` function. This function takes a closure with two arguments - one for reading and one for writing. Typically we call these `r` and `w` respectively. The `r` argument can be used to inspect the current contents of the register, and the `w` argument can be used to modify the register contents.
+如果我们只想更改该寄存器中的一个特定子字段，而使其他子字段保持不变，则可以使用`modify`函数。此函数采用带有两个参数的闭包-一个用于读取，一个用于写入。通常，我们分别将它们称为`r`和`w`。 r参数可用于读取寄存器的当前内容，w参数可用于修改寄存器的内容。
 
-```rust,ignore
+```rust , ignore
 pwm.ctl.modify(|r, w| w.globalsync0().clear_bit());
 ```
 
-The `modify` function really shows the power of closures here. In C, we'd have to read into some temporary value, modify the correct bits and then write the value back. This means there's considerable scope for error:
+`modify`函数在这里显示了闭包的强大。在C语言中，我们必须读入到一些临时值，修改特定位上的值，然后将其写回。这意味着不小的出错几率：
 
 ```C
 uint32_t temp = pwm0.ctl.read();
@@ -115,17 +119,17 @@ temp2 |= PWM0_ENABLE_PWM4EN;
 pwm0.enable.write(temp); // Uh oh! Wrong variable!
 ```
 
-[svd2rust]: https://crates.io/crates/svd2rust
-[tm4c123x documentation R]: https://docs.rs/tm4c123x/0.7.0/tm4c123x/pwm0/ctl/struct.R.html
-[tm4c123x documentation W]: https://docs.rs/tm4c123x/0.7.0/tm4c123x/pwm0/ctl/struct.W.html
+[svd2rust]:https://crates.io/crates/svd2rust
+[tm4c123x文档R]:https://docs.rs/tm4c123x/0.7.0/tm4c123x/pwm0/ctl/struct.R.html
+[tm4c123x文档W]:https://docs.rs/tm4c123x/0.7.0/tm4c123x/pwm0/ctl/struct.W.html
 
-## Using a HAL crate
+## 使用HAL crate
 
-The HAL crate for a chip typically works by implementing a custom Trait for the raw structures exposed by the PAC. Often this trait will define a function called `constrain()` for single peripherals or `split()` for things like GPIO ports with multiple pins. This function will consume the underlying raw peripheral structure and return a new object with a higher-level API. This API may also do things like have the Serial port `new` function require a borrow on some `Clock` structure, which can only be generated by calling the function which configures the PLLs and sets up all the clock frequencies. In this way, it is statically impossible to create a Serial port object without first having configured the clock rates, or for the Serial port object to mis-convert the baud rate into clock ticks. Some crates even define special traits for the states each GPIO pin can be in, requiring the user to put a pin into the correct state (say, by selecting the appropriate Alternate Function Mode) before passing the pin into Peripheral. All with no run-time cost!
+具体芯片的HAL crate一般是通过为PAC crate导出的结构体实现自定义Trait来工作。通常，这个自定义crate为单体外设定义一个名为 `constrain()` 的函数，为具有多个引脚的GPIO端口之类的外设定义 `split()` 函数。该函数将消耗底层的原始外围设备结构，并返回具有更高级别API的新对象。这个API可能还会做一些事情，例如让串口`new`函数需要`Clock`结构体的借用，这个Clock结构体只能通过调用特定函数来生成,而这个函数会配置PLL并设置时钟频率。这样在没有先配置时钟频率的情况下，就不可能创建串口对象, 否则串口对象有可能将波特率误转换为错误的时钟滴答。一些crate甚至为每个GPIO引脚可以处于的状态定义了特殊的Trait，要求用户在将引脚传递到外设之前将其置于正确的状态(例如，通过选择适当的可选功能模式)。更重要的是,这些都是零成本抽象！
 
-Let's see an example:
+让我们来看一个例子：
 
-```rust,ignore
+```rust , ignore
 #![no_std]
 #![no_main]
 

@@ -1,16 +1,12 @@
-# Exceptions
+# 异常
 
-Exceptions, and interrupts, are a hardware mechanism by which the processor
-handles asynchronous events and fatal errors (e.g. executing an invalid
-instruction). Exceptions imply preemption and involve exception handlers,
-subroutines executed in response to the signal that triggered the event.
+异常和中断是一种硬件机制，处理器通过该机制处理异步事件和致命错误(例如执行无效指令)。异常意味着抢占，也包括异常处理程序，发生异常时,这些子程序会被立即执行,以响应触发异常的信号。
 
-The `cortex-m-rt` crate provides an [`exception`] attribute to declare exception
-handlers.
+cortex-m-rt crate提供了一个[`exception`]属性来声明异常处理程序。
 
-[`exception`]: https://docs.rs/cortex-m-rt-macros/latest/cortex_m_rt_macros/attr.exception.html
+[`exception`]:https://docs.rs/cortex-m-rt-macros/latest/cortex_m_rt_macros/attr.exception.html
 
-``` rust,ignore
+``` rust , ignore
 // Exception handler for the SysTick (System Timer) exception
 #[exception]
 fn SysTick() {
@@ -18,15 +14,11 @@ fn SysTick() {
 }
 ```
 
-Other than the `exception` attribute exception handlers look like plain
-functions but there's one more difference: `exception` handlers can *not* be
-called by software. Following the previous example, the statement `SysTick();`
-would result in a compilation error.
+除了`exception` 属性之外，异常处理程序看起来像普通函数，但还有另外一个区别：`exception` 处理程序不能被软件调用。上面的示例中，语句`SysTick();`将导致编译错误。
 
-This behavior is pretty much intended and it's required to provide a feature:
-`static mut` variables declared *inside* `exception` handlers are *safe* to use.
+这种行为是有意为之，`exception`属性还让在异常处理程序中声明`static mut`变量是安全的。
 
-``` rust,ignore
+``` rust , ignore
 #[exception]
 fn SysTick() {
     static mut COUNT: u32 = 0;
@@ -36,28 +28,17 @@ fn SysTick() {
 }
 ```
 
-As you may know, using `static mut` variables in a function makes it
-[*non-reentrant*](https://en.wikipedia.org/wiki/Reentrancy_(computing)). It's undefined behavior to call a non-reentrant function,
-directly or indirectly, from more than one exception / interrupt handler or from
-`main` and one or more exception / interrupt handlers.
+如您所知，在函数中使用`static mut`变量使其成为[不可重入](https://en.wikipedia.org/wiki/Reentrancy_(computing))。 从多个异常/中断处理程序或`main`中直接或间接调用不可重入函数是不确定的行为。
 
-Safe Rust must never result in undefined behavior so non-reentrant functions
-must be marked as `unsafe`. Yet I just told that `exception` handlers can safely
-use `static mut` variables. How is this possible? This is possible because
-`exception` handlers can *not* be called by software thus reentrancy is not
-possible.
+Safe Rust绝不能导致不确定的行为，因此非可重入函数必须标记为 `unsafe`。但是我刚刚却说异常处理程序可以安全地使用`static mut`变量。这怎么可能？这是可能的，因为异常处理程序不能被函数调用，因此无法重入。
 
-## A complete example
+## 一个完整的例子
 
-Here's an example that uses the system timer to raise a `SysTick` exception
-roughly every second. The `SysTick` exception handler keeps track of how many
-times it has been called in the `COUNT` variable and then prints the value of
-`COUNT` to the host console using semihosting.
+这是一个使用系统计时器每秒引发一次`SysTick` 异常的示例。 SysTick异常处理程序通过COUNT变量跟踪自己被调用了多少次，然后使用半主机将COUNT的值打印到主机控制台。
 
-> **NOTE**: You can run this example on any Cortex-M device; you can also run it
-> on QEMU
+> **注意**：您可以在任何Cortex-M设备上运行此示例；您也可以在QEMU上运行它
 
-```rust,ignore
+```rust , ignore
 #![deny(unsafe_code)]
 #![no_main]
 #![no_std]
@@ -114,6 +95,7 @@ fn SysTick() {
 }
 ```
 
+
 ``` console
 $ tail -n5 Cargo.toml
 ```
@@ -132,61 +114,43 @@ $ cargo run --release
 123456789
 ```
 
-If you run this on the Discovery board you'll see the output on the OpenOCD
-console. Also, the program will *not* stop when the count reaches 9.
+如果在开发板上运行此命令，则会在OpenOCD控制台上看到输出。但是当计数达到9时，程序将**不**停止。
 
-## The default exception handler
+## 默认异常处理程序
 
-What the `exception` attribute actually does is *override* the default exception
-handler for a specific exception. If you don't override the handler for a
-particular exception it will be handled by the `DefaultHandler` function, which
-defaults to:
+ `exception`属性的实际作用是**覆盖**特定异常的默认异常处理程序。如果您不重写特定异常的处理程序，它将由`DefaultHandler`函数处理，该函数默认为：
 
-``` rust,ignore
+``` rust , ignore
 fn DefaultHandler() {
     loop {}
 }
 ```
 
-This function is provided by the `cortex-m-rt` crate and marked as
-`#[no_mangle]` so you can put a breakpoint on "DefaultHandler" and catch
-*unhandled* exceptions.
+此功能由`cortex-m-rt`crate提供，并标记为 `#[no_mangle]`，因此您可以在“ DefaultHandler”上放置断点并捕获**未处理**异常。
 
-It's possible to override this `DefaultHandler` using the `exception` attribute:
+可以使用`exception`属性覆盖这个`DefaultHandler`：
 
-``` rust,ignore
+``` rust , ignore
 #[exception]
 fn DefaultHandler(irqn: i16) {
     // custom default handler
 }
 ```
 
-The `irqn` argument indicates which exception is being serviced. A negative
-value indicates that a Cortex-M exception is being serviced; and zero or a
-positive value indicate that a device specific exception, AKA interrupt, is
-being serviced.
+irqn是正在处理的异常编号。负值表示Cortex-M异常；零或正值表示设备特定的异常，即AKA中断。
 
-## The hard fault handler
+## 硬故障处理程序
 
-The `HardFault` exception is a bit special. This exception is fired when the
-program enters an invalid state so its handler can *not* return as that could
-result in undefined behavior. Also, the runtime crate does a bit of work before
-the user defined `HardFault` handler is invoked to improve debuggability.
+`HardFault`异常有点特殊。当程序进入无效状态时，将引发此异常，因此它的处理程序不能返回，因为这可能导致未定义的行为。另外，在调用用户定义的`HardFault`前，运行时crate会做一些工作以提高程序的可调试性。
 
-The result is that the `HardFault` handler must have the following signature:
-`fn(&ExceptionFrame) -> !`. The argument of the handler is a pointer to
-registers that were pushed into the stack by the exception. These registers are
-a snapshot of the processor state at the moment the exception was triggered and
-are useful to diagnose a hard fault.
+所以`HardFault`处理函数必须具有以下签名：`fn(＆ExceptionFrame)->！`。处理程序的参数是指向被异常压入堆栈的寄存器的指针。这些寄存器是异常触发时处理器状态的快照，可用于诊断故障。
 
-Here's an example that performs an illegal operation: a read to a nonexistent
-memory location.
+这是一个执行非法操作的示例：读取不存在的内存位置。
 
-> **NOTE**: This program won't work, i.e. it won't crash, on QEMU because
-> `qemu-system-arm -machine lm3s6965evb` doesn't check memory loads and will
-> happily return `0 `on reads to invalid memory.
+> **注意**：该程序在QEMU上不起作用，即不会崩溃，因为`qemu-system-arm -machine lm3s6965evb`不会检查内存读取，并且在读取到无效内存时会很高兴地返回`0`。
 
-```rust,ignore
+
+```rust , ignore
 #![no_main]
 #![no_std]
 
@@ -218,8 +182,7 @@ fn HardFault(ef: &ExceptionFrame) -> ! {
 }
 ```
 
-The `HardFault` handler prints the `ExceptionFrame` value. If you run this
-you'll see something like this on the OpenOCD console.
+`HardFault`处理程序将打印`ExceptionFrame`值。如果运行此程序，您将在OpenOCD控制台上看到类似的内容。
 
 ``` console
 $ openocd
@@ -236,10 +199,9 @@ ExceptionFrame {
 }
 ```
 
-The `pc` value is the value of the Program Counter at the time of the exception
-and it points to the instruction that triggered the exception.
+`pc` 值是发生异常时程序计数器的值，它指向触发异常的指令。
 
-If you look at the disassembly of the program:
+如果您查看程序的反汇编：
 
 
 ``` console
@@ -252,7 +214,4 @@ ResetTrampoline:
  800094c:       b       #-0x4 <ResetTrampoline+0xa>
 ```
 
-You can lookup the value of the program counter `0x0800094a` in the dissassembly.
-You'll see that a load operation (`ldr r0, [r0]` ) caused the exception.
-The `r0` field of `ExceptionFrame` will tell you the value of register `r0`
-was `0x3fff_fffe` at that time.
+您可以在反汇编中查找程序计数器`0x0800094a` 的值。您将看到加载操作(`ldr r0，[r0]`)引起了异常。 `ExceptionFrame`的`r0`字段将告诉您寄存器r0的值为当时的0x3fff_fffe。

@@ -1,39 +1,32 @@
-# Meet Your Hardware
+# 认识您的硬件
 
-Let's get familiar with the hardware we'll be working with.
+让我们熟首先了解一下我们将要使用的硬件。
 
-## STM32F3DISCOVERY (the "F3")
+## STM32F3DISCOVERY(以下简称"F3")
 
-<p align="center">
-<img title="F3" src="../assets/f3.jpg">
+<p align ="center">
+<img title ="F3" src ="../assets/f3.jpg">
 </p>
 
-What does this board contain?
+该板包含什么？
 
-- A [STM32F303VCT6](https://www.st.com/en/microcontrollers/stm32f303vc.html) microcontroller. This microcontroller has
-  - A single-core ARM Cortex-M4F processor with hardware support for single-precision floating point
-    operations and a maximum clock frequency of 72 MHz.
+- [STM32F303VCT6](https://www.st.com/en/microcontrollers/stm32f303vc.html)微控制器。该微控制器具有
+    - 支持单精度浮点数的单核ARM Cortex-M4F处理器，最大时钟频率为72 MHz。
+    - 256KiB的Flash。 (1 KiB = 1024字节)
+    - 48KiB的RAM。
+    - 各种集成外设，例如定时器，I2C，SPI和USART。
+    - 通用输入输出(GPIO)和其他类型的引脚，可通过板侧的两排引脚访问。
+    - 一个USB接口 标有"USB USER"的USB端口。
+- [加速度计](https://en.wikipedia.org/wiki/Accelerometer)(作为[LSM303DLHC](https://www.st.com/en/mems-and-sensors/lsm303dlhc.html)的一部分)。
 
-  - 256 KiB of "Flash" memory. (1 KiB = 10**24** bytes)
+- [磁力仪](https://en.wikipedia.org/wiki/Magnetometer)(作为[LSM303DLHC](https://www.st.com/en/mems-and-sensors/lsm303dlhc.html)的一部分)。
 
-  - 48 KiB of RAM.
+- [陀螺仪](https://en.wikipedia.org/wiki/Gyroscope) (作为[L3GD20](https://www.pololu.com/file/0J563/L3GD20.pdf)芯片的一部分)。
 
-  - A variety of integrated peripherals such as timers, I2C, SPI and USART.
+- 8个LED(以指南针样式排列)
 
-  - General purpose Input Output (GPIO) and other types of pins accessible through the two rows of headers along side the board.
-  
-  - A USB interface accessible through the USB port labeled "USB USER".
+- 第二个微处理器：[STM32F103](https://www.st.com/en/microcontrollers/stm32f103cb.html)。该微控制器实际上是板载编程器/调试器的一部分，连接到名为"USB ST-LINK"的USB端口。
 
-- An [accelerometer](https://en.wikipedia.org/wiki/Accelerometer) as part of the [LSM303DLHC](https://www.st.com/en/mems-and-sensors/lsm303dlhc.html) chip.
+有关该板子的功能和更多规格的详细列表，请访问[STMicroelectronics](https://www.st.com/en/evaluation-tools/stm32f3discovery.html)。
 
-- A [magnetometer](https://en.wikipedia.org/wiki/Magnetometer) as part of the [LSM303DLHC](https://www.st.com/en/mems-and-sensors/lsm303dlhc.html) chip.
-
-- A [gyroscope](https://en.wikipedia.org/wiki/Gyroscope) as part of the [L3GD20](https://www.pololu.com/file/0J563/L3GD20.pdf) chip.
-
-- 8 user LEDs arranged in the shape of a compass.
-
-- A second microcontroller: a [STM32F103](https://www.st.com/en/microcontrollers/stm32f103cb.html). This microcontroller is actually part of an on-board programmer / debugger and is connected to the USB port named "USB ST-LINK".
-
-For a more detailed list of features and further specifications of the board take a look at the [STMicroelectronics](https://www.st.com/en/evaluation-tools/stm32f3discovery.html) website.
-
-A word of caution: be careful if you want to apply external signals to the board. The microcontroller STM32F303VCT6 pins take a nominal voltage of 3.3 volts. For further information consult the [6.2 Absolute maximum ratings section in the manual](https://www.st.com/resource/en/datasheet/stm32f303vc.pdf)
+**特别注意**：如果要将外部信号施加到板上，请小心。微控制器STM32F303VCT6引脚的标称电压为3.3伏。有关更多信息，请参阅[手册中的6.2章节 绝对最大额定值部分](https://www.st.com/resource/zh/datasheet/stm32f303vc.pdf)

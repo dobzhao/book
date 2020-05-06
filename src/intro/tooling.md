@@ -1,84 +1,53 @@
-# Tooling
+# 其他工具
 
-Dealing with microcontrollers involves using several different tools as we'll be
-dealing with an architecture different than your laptop's and we'll have to run
-and debug programs on a *remote* device.
+进行嵌入式开发和在pc上进行开发不太一样,一般来说,你必须在远程设备上进行运行和调试,所以需要一些专门的控制器相关的工具的支持.
 
-We'll use all the tools listed below. Any recent version should work when a
-minimum version is not specified, but we have listed the versions we have
-tested.
+ 
+我们将使用下面列出的所有工具。我们列出了我们拥有的经过测试的版本,当然一般来说更高的版本也是可以的。
 
-- Rust 1.31, 1.31-beta, or a newer toolchain PLUS ARM Cortex-M compilation
-  support.
-- [`cargo-binutils`](https://github.com/rust-embedded/cargo-binutils) ~0.1.4
-- [`qemu-system-arm`](https://www.qemu.org/). Tested versions: 3.0.0
-- OpenOCD >=0.8. Tested versions: v0.9.0 and v0.10.0
-- GDB with ARM support. Version 7.12 or newer highly recommended. Tested
-  versions: 7.10, 7.11, 7.12 and 8.1
-- [`cargo-generate`](https://github.com/ashleygwilliams/cargo-generate) or `git`.
-  These tools are optional but will make it easier to follow along with the book.
+- Rust 1.31、1.31-beta或更新的工具链以及ARM Cortex-M编译支持。
+- [`cargo-binutils`](https://github.com/rust-embedded/cargo-binutils)〜0.1.4
+- [`qemu-system-arm`](https://www.qemu.org/)经过测试的版本： 3.0.0
+- OpenOCD> = 0.8。经过测试的版本：v0.9.0和v0.10.0
+- 具有ARM支持的GDB。强烈建议使用7.12版或更高版本。经过测试版本：7.10、7.11、7.12和8.1
+- [`cargo-generate`](https://github.com/ashleygwilliams/cargo-generate)或`git`。这些工具是可选的，它能够让我们更容易使用书上的例子. 
 
-The text below explains why we are using these tools. Installation instructions
-can be found on the next page.
 
-## `cargo-generate` OR `git`
+## `cargo-generate`或`git`
 
-Bare metal programs are non-standard (`no_std`) Rust programs that require some
-adjustments to the linking process in order to get the memory layout of the program
-right. This requires some additional files (like linker scripts) and 
-settings (like linker flags). We have packaged those for you in a template
-such that you only need to fill in the missing information (such as the project name and the
-characteristics of your target hardware).
+裸机程序是非标准(`no_std`)Rust程序，一般需要介入链接过程以修正程序的内存布局。这需要一些其他文件(例如链接器脚本)和设置(链接参数)。我们已经为您打包了这些模板,这样您只需要填写缺少的信息(例如项目名称和目标硬件的特性)。
 
-Our template is compatible with `cargo-generate`: a Cargo subcommand for
-creating new Cargo projects from templates. You can also download the
-template using `git`, `curl`, `wget`, or your web browser.
+我们的模板兼容`cargo-generate`(这是一个cargo的子命令)。您也可以使用`git`，`curl`，`wget`或浏览器来下载模板。
 
 ## `cargo-binutils`
 
-`cargo-binutils` is a collection of Cargo subcommands that make it easy to use
-the LLVM tools that are shipped with the Rust toolchain. These tools include the
-LLVM versions of `objdump`, `nm` and `size` and are used for inspecting
-binaries.
+`cargo-binutils`是一系列Cargo子命令的集合，通过它们可以避免直接与Rust工具链附带的LLVM工具打交道,它包括objdump，nm和size等用于检查二进制文件的工具.
 
-The advantage of using these tools over GNU binutils is that (a) installing the
-LLVM tools is the same one-command installation (`rustup component add
-llvm-tools-preview`) regardless of your OS and (b) tools like `objdump` support
-all the architectures that `rustc` supports -- from ARM to x86_64 -- because
-they both share the same LLVM backend.
+与GNU binutils相比，使用这些工具的优势在于:
+- 安装简单,无论什么系统,一条命令(`rustup component add llvm-tools-preview`)与LLVM工具一同安装
+- 像`objdump`的这样的工具与rustc一样支持所有的架构(从ARM到x86_64),因为它们都共享相同的LLVM后端。
 
 ## `qemu-system-arm`
 
-QEMU is an emulator. In this case we use the variant that can fully emulate ARM
-systems. We use QEMU to run embedded programs on the host. Thanks to this you
-can follow some parts of this book even if you don't have any hardware with you!
+QEMU是一个通用模拟器,使用它可以完全模拟ARM处理器,这样可以在主机上运行嵌入式程序。幸亏有了 QEMU,这样就算是你没有任何硬件,也可以运行本书的部分示例！
 
 ## GDB
+调试器对于嵌入式开发非常重要,因为可能你都无法保证能够向控制台打印日志. 甚至有时你的硬件平台都没有提供闪烁的LED灯.
+ 
 
-A debugger is a very important component of embedded development as you may not
-always have the luxury to log stuff to the host console. In some cases, you may
-not even have LEDs to blink on your hardware!
-
-In general, LLDB works as well as GDB when it comes to debugging but we haven't
-found an LLDB counterpart to GDB's `load` command, which uploads the program to
-the target hardware, so currently we recommend that you use GDB.
+通常在调试方面，LLDB和GDB一样好，但是我们还没有找到了与GDB的“ load”命令相对应的LLDB命令，该命令可以将程序上传到目标硬件，因此当前我们建议您使用GDB。
 
 ## OpenOCD
+ 
 
-GDB isn't able to communicate directly with the ST-Link debugging hardware on
-your STM32F3DISCOVERY development board. It needs a translator and the Open
-On-Chip Debugger, OpenOCD, is that translator. OpenOCD is a program that runs
-on your laptop/PC and translates between GDB's TCP/IP based remote debug
-protocol and ST-Link's USB based protocol.
 
-OpenOCD also performs other important work as part of its translation for the
-debugging of the ARM Cortex-M based microcontroller on your STM32F3DISCOVERY
-development board:
-* It knows how to interact with the memory mapped registers used by the ARM
-  CoreSight debug peripheral. It is these CoreSight registers that allow for:
-  * Breakpoint/Watchpoint manipulation
-  * Reading and writing of the CPU registers
-  * Detecting when the CPU has been halted for a debug event
-  * Continuing CPU execution after a debug event has been encountered
-  * etc.
-* It also knows how to erase and write to the microcontroller's FLASH
+GDB无法直接与STM32F3DISCOVERY开发板上的ST-Link调试硬件进行通信。它需要一个翻译器，而开放式片上调试器OpenOCD就是那个翻译器。 OpenOCD运行在PC上，可在基于TCP/IP的GDB远程调试协议和基于USB的ST-Link协议之间进行转换。
+
+OpenOCD还执行其他重要工作：
+* 它知道如何与用于ARM CoreSight调试外围设备使用的内存映射寄存器进行交互。这些CoreSight寄存器允许：
+  + 断点/观察点操作
+  + 读取和写入CPU寄存器
+  + 检测CPU何时因调试事件而暂停
+  + 遇到调试事件后继续执行CPU
+  + 其他功能
+* 它也知道如何擦除和写入微控制器的FLASH

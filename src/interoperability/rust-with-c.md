@@ -1,22 +1,17 @@
-# A little Rust with your C
+# C中使用Rust代码
 
-Using Rust code inside a C or C++ project mostly consists of two parts.
+在C或C++项目中使用Rust代码主要包括两部分。
 
-- Creating a C-friendly API in Rust
-- Embedding your Rust project into an external build system
+- 在Rust中创建C友好的API
+- 将Rust项目嵌入到外部构建系统中
 
-Apart from `cargo` and `meson`, most build systems don't have native Rust support.
-So you're most likely best off just using `cargo` for compiling your crate and
-any dependencies.
+除了`cargo`和`meson`外，大多数构建系统没有本地Rust支持。因此，最有可能最好是使用`cargo`来编译crate和所有依赖项。
 
-## Setting up a project
+## 建立一个项目
 
-Create a new `cargo` project as usual.
+照常创建一个新的`cargo`项目。
 
-There are flags to tell `cargo` to emit a systems library, instead of
-its regular rust target.
-This also allows you to set a different output name for your library,
-if you want it to differ from the rest of your crate.
+通能参数可以告诉`cargo`生成一个系统库crate，而不是常规的Rust项目。您也可以为库设置不同的输出名称。
 
 ```toml
 [lib]
@@ -25,79 +20,61 @@ crate-type = ["cdylib"]      # Creates dynamic lib
 # crate-type = ["staticlib"] # Creates static lib
 ```
 
-## Building a `C` API
+## 构建`C` API
 
-Because C++ has no stable ABI for the Rust compiler to target, we use `C` for
-any interoperability between different languages. This is no exception when using Rust
-inside of C and C++ code.
+由于C++没有稳定的ABI，因此我们将`C`用于不同语言之间的任何互操作。在C和C++代码中使用Rust时也不例外。
 
-### `#[no_mangle]`
+### `# [no_mangle]`
 
-The Rust compiler mangles symbol names differently than native code linkers expect.
-As such, any function that Rust exports to be used outside of Rust needs to be told
-not to be mangled by the compiler.
+Rust编译器处理符号名称的方式与c语言链接器期望的方式不同。因此，需要告知Rust编译器不要对要在Rust之外使用的任何函数进行改动。
 
-### `extern "C"`
+### `extern“ C”`
 
-By default, any function you write in Rust will use the
-Rust ABI (which is also not stabilized).
-Instead, when building outwards facing FFI APIs we need to
-tell the compiler to use the system ABI.
+默认情况下，您在Rust中编写的任何函数都将使用Rust ABI(它也是不稳定的)。而当构建FFI API时，我们需要告诉编译器使用系统ABI。
 
-Depending on your platform, you might want to target a specific ABI version, which are
-documented [here](https://doc.rust-lang.org/reference/items/external-blocks.html).
+根据您的平台，您可能要特定​​的ABI版本，这些在[此处](https://doc.rust-lang.org/reference/items/external-blocks.html)中进行了说明。
 
 ---
 
-Putting these parts together, you get a function that looks roughly like this.
+将刚刚的内容总结在一起，您将获得一个大致如下所示的函数。
 
-```rust,ignore
+```rust , ignore
 #[no_mangle]
 pub extern "C" fn rust_function() {
 
 }
 ```
 
-Just as when using `C` code in your Rust project you now need to transform data
-from and to a form that the rest of the application will understand.
+就像在Rust项目中使用C代码一样，您现在需要将数据转换成其他应用程序可以理解的格式。
 
-## Linking and greater project context.
+## 链接和更大的项目上下文。
 
-So then, that's one half of the problem solved.
-How do you use this now?
+因此，现在只是解决了问题的一半。您现在如何使用它？
 
-**This very much depends on your project and/or build system**
+**这在很大程度上取决于您的项目和/或构建系统**
 
-`cargo` will create a `my_lib.so`/`my_lib.dll` or `my_lib.a` file,
-depending on your platform and settings. This library can simply be linked
-by your build system.
+`cargo`将根据您的平台和设置创建一个`my_lib.so`/`my_lib.dll` / `my_lib.a` 文件。该库可以直接由您的构建系统链接。
 
-However, calling a Rust function from C requires a header file to declare
-the function signatures.
+但是，从C调用Rust函数需要一个头文件来声明函数签名。
 
-Every function in your Rust-ffi API needs to have a corresponding header function.
+Rust-ffi API中的每个函数都需要具有相应的函数声明。
 
-```rust,ignore
+```rust , ignore
 #[no_mangle]
 pub extern "C" fn rust_function() {}
 ```
-
-would then become
+需要这样一个声明:
 
 ```C
 void rust_function();
 ```
+ 
+有一个工具可以自动执行此过程，称为[cbindgen]，它可以分析Rust代码，然后从中生成C和C++项目的头文件。
 
-etc.
+[cbindgen]:https://github.com/eqrion/cbindgen
 
-There is a tool to automate this process,
-called [cbindgen] which analyses your Rust code
-and then generates headers for your C and C++ projects from it.
+至此，在C语言中调用Rust函数只需添加头文件并调用它们！
 
-[cbindgen]: https://github.com/eqrion/cbindgen
-
-At this point, using the Rust functions from C
-is as simple as including the header and calling them!
 
 ```C
 #include "my-rust-project.h"

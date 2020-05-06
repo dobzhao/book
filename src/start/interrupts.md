@@ -1,32 +1,23 @@
-# Interrupts
+# 中断
 
-Interrupts differ from exceptions in a variety of ways but their operation and
-use is largely similar and they are also handled by the same interrupt
-controller. Whereas exceptions are defined by the Cortex-M architecture,
-interrupts are always vendor (and often even chip) specific implementations,
-both in naming and functionality.
+中断在很多方面与异常不同，但是它们的操作和使用在很大程度上相似，并且它们也由同一中断控制器处理。尽管异常是由Cortex-M架构定义的，但是中断在命名和功能上始终是特定于供应商(甚至是芯片)的特定实现。
 
-Interrupts do allow for a lot of flexibility which needs to be accounted for
-when attempting to use them in an advanced way. We will not cover those uses in
-this book, however it is a good idea to keep the following in mind:
+中断确实具有很大的灵活性，在尝试以高级方式使用它们时需要考虑这些灵活性。我们不会在本书中介绍这些用法，但是请牢记以下几点：
 
-* Interrupts have programmable priorities which determine their handlers' execution order
-* Interrupts can nest and preempt, i.e. execution of an interrupt handler might be interrupted by another higher-priority interrupt
-* In general the reason causing the interrupt to trigger needs to be cleared to prevent re-entering the interrupt handler endlessly
+* 中断具有可编程的优先级，该优先级确定其处理程序的执行顺序
+* 中断可以嵌套和抢占，即中断处理程序的执行可能会被另一个更高优先级的中断中断
+* 通常需要清除导致中断触发的事件，以防止无限次重新进入中断处理程序
 
-The general initialization steps at runtime are always the same:
-* Setup the peripheral(s) to generate interrupts requests at the desired occasions
-* Set the desired priority of the interrupt handler in the interrupt controller
-* Enable the interrupt handler in the interrupt controller
+中断的常规初始化步骤始终相同：
+* 设置外设以在需要的情况下生成中断请求
+* 在中断控制器中设置所需的中断处理程序优先级
+* 在中断控制器中启用中断处理程序
 
-Similarly to exceptions, the `cortex-m-rt` crate provides an [`interrupt`]
-attribute to declare interrupt handlers. The available interrupts (and
-their position in the interrupt handler table) are usually automatically
-generated via `svd2rust` from a SVD description.
+与异常类似，`cortex-m-rt` crate 提供了一个[`interrupt`]属性来声明中断处理程序。可用的中断(及其在中断处理程序表中的位置)通常是使用`svd2rust`基于SVD描述文件自动生成的。
 
-[`interrupt`]: https://docs.rs/cortex-m-rt-macros/0.1.5/cortex_m_rt_macros/attr.interrupt.html
+[`interrupt`]:https://docs.rs/cortex-m-rt-macros/0.1.5/cortex_m_rt_macros/attr.interrupt.html
 
-``` rust,ignore
+``` rust , ignore
 // Interrupt handler for the Timer2 interrupt
 #[interrupt]
 fn TIM2() {
@@ -35,16 +26,11 @@ fn TIM2() {
 }
 ```
 
-Interrupt handlers look like plain functions (except for the lack of arguments)
-similar to exception handlers. However they can not be called directly by other
-parts of the firmware due to the special calling conventions. It is however
-possible to generate interrupt requests in software to trigger a diversion to
-the interrupt handler.
+中断处理程序类似于异常处理程序，它们不能被固件的其他部分直接调用。但是可以在软件中生成中断请求，以触发对中断处理程序。
 
-Similar to exception handlers it is also possible to declare `static mut`
-variables inside the interrupt handlers for *safe* state keeping.
+与异常处理程序类似，在中断处理程序中声明`static mut`变量也是安全的。
 
-``` rust,ignore
+``` rust , ignore
 #[interrupt]
 fn TIM2() {
     static mut COUNT: u32 = 0;
@@ -54,7 +40,6 @@ fn TIM2() {
 }
 ```
 
-For a more detailed description about the mechanisms demonstrated here please
-refer to the [exceptions section].
+有关此处演示的机制的更详细说明，请参考[异常]。
 
-[exceptions section]: ./exceptions.md
+[异常]:./exceptions.md

@@ -1,63 +1,47 @@
-# Interoperability
+# 互操作性
 
-Interoperability between Rust and C code is always dependent
-on transforming data between the two languages.
-For this purposes there are two dedicated modules
-in the `stdlib` called
-[`std::ffi`](https://doc.rust-lang.org/std/ffi/index.html) and
-[`std::os::raw`](https://doc.rust-lang.org/std/os/raw/index.html).
+Rust与C代码之间的互操作性始终取决于两种语言之间的数据转换。为此，在`stdlib`中有两个专用模块称为[`std::ffi`](https://doc.rust-lang.org/std/ffi/index.html)和[`std::os::raw`](https://doc.rust-lang.org/std/os/raw/index.html)。
 
-`std::os::raw` deals with low-level primitive types that can
-be converted implicitly by the compiler
-because the memory layout between Rust and C
-is similar enough or the same.
+`std::os::raw`处理可以由编译器隐式转换的低级基本类型，因为Rust和C之间的内存布局足够相似或相同。
 
-`std::ffi` provides some utility for converting more complex
-types such as Strings, mapping both `&str` and `String`
-to C-types that are easier and safer to handle.
+`std::ffi` 提供了一些实用程序，用于转换更复杂的类型(例如字符串)，将`&str`和`String`都映射到更易于处理和更安全的C类型。
 
-Neither of these modules are available in `core`, but you can find a `#![no_std]`
-compatible version of `std::ffi::{CStr,CString}` in the [`cstr_core`] crate, and
-most of the `std::os::raw` types in the [`cty`] crate.
+这两个模块都不在`core`中，但您可以在[`cstr_core`]crate中找到支持`#![no_std]`的`std::ffi::{CStr,CString}`，`std::os::raw`中的大多数类型可以在[`cty`] crate中找到。
 
-[`cstr_core`]: https://crates.io/crates/cstr_core
-[`cty`]: https://crates.io/crates/cty
+[`cstr_core`]:https://crates.io/crates/cstr_core
+[`cty`]:https://crates.io/crates/cty
 
-| Rust type  | Intermediate | C type       |
-|------------|--------------|--------------|
+|Rust类型| 中间类型|C类型 |
+| ------------ | -------------- | -------------- |
 | String     | CString      | *char        |
 | &str       | CStr         | *const char  |
 | ()         | c_void       | void         |
 | u32 or u64 | c_uint       | unsigned int |
 | etc        | ...          | ...          |
 
-As mentioned above, primitive types can be converted
-by the compiler implicitly.
 
-```rust,ignore
+如上所述，基本类型可以由编译器隐式转换。
+
+```rust , ignore
 unsafe fn foo(num: u32) {
     let c_num: c_uint = num;
     let r_num: u32 = c_num;
 }
 ```
 
-## Interoperability with other build systems
+## 与其他构建系统的互操作性
 
-A common requirement for including Rust in your embedded project is combining
-Cargo with your existing build system, such as make or cmake.
+嵌入式项目中经常会碰到需要Cargo与现有的构建系统(例如make或cmake)结合的情况。
 
-We are collecting examples and use cases for this on our issue tracker in
-[issue #61].
+ [问题# 61]上有我们收集的示例。
 
-[issue #61]: https://github.com/rust-embedded/book/issues/61
+[问题# 61]:https：//github.com/rust-embedded/book/issues/61
 
 
-## Interoperability with RTOSs
+## 与RTOS的互操作性
 
-Integrating Rust with an RTOS such as FreeRTOS or ChibiOS is still a work in
-progress; especially calling RTOS functions from Rust can be tricky.
+将Rust与FreeRTOS或ChibiOS等RTOS集成仍在进行中。特别是从Rust调用RTOS函数可能很棘手。
 
-We are collecting examples and use cases for this on our issue tracker in
-[issue #62].
+[问题# 62]上有我们收集的示例。
 
-[issue #62]: https://github.com/rust-embedded/book/issues/62
+[问题# 62]:https：//github.com/rust-embedded/book/issues/62

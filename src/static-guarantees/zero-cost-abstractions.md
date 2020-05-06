@@ -1,8 +1,8 @@
-# Zero Cost Abstractions
+# 零成本抽象
 
-Type states are also an excellent example of Zero Cost Abstractions - the ability to move certain behaviors to compile time execution or analysis. These type states contain no actual data, and are instead used as markers. Since they contain no data, they have no actual representation in memory at runtime:
+类型状态机也是零成本抽象的一个很好的例子--能够将某些需要运行时执行和检查的行为提前到编译时。这些类型状态不包含实际数据，而是用作标记。由于它们不包含任何数据，因此它们在运行时不占用额外的内存空间：
 
-```rust,ignore
+```rust , ignore
 use core::mem::size_of;
 
 let _ = size_of::<Enabled>();    // == 0
@@ -11,17 +11,18 @@ let _ = size_of::<PulledHigh>(); // == 0
 let _ = size_of::<GpioConfig<Enabled, Input, PulledHigh>>(); // == 0
 ```
 
-## Zero Sized Types
+## 零大小类型
 
-```rust,ignore
+```rust , ignore
 struct Enabled;
 ```
 
-Structures defined like this are called Zero Sized Types, as they contain no actual data. Although these types act "real" at compile time - you can copy them, move them, take references to them, etc., however the optimizer will completely strip them away.
+像这样定义的结构称为零大小类型，因为它们不包含实际数据。尽管这些类型在编译时表现为“真实”-您可以复制，移动它们，引用它们等，但是编译器在优化后就会像不存在一样。
 
-In this snippet of code:
+在这段代码中：
 
-```rust,ignore
+
+```rust , ignore
 pub fn into_input_high_z(self) -> GpioConfig<Enabled, Input, HighZ> {
     self.periph.modify(|_r, w| w.input_mode().high_z());
     GpioConfig {
@@ -33,10 +34,10 @@ pub fn into_input_high_z(self) -> GpioConfig<Enabled, Input, HighZ> {
 }
 ```
 
-The GpioConfig we return never exists at runtime. Calling this function will generally boil down to a single assembly instruction - storing a constant register value to a register location. This means that the type state interface we've developed is a zero cost abstraction - it uses no more CPU, RAM, or code space tracking the state of `GpioConfig`, and renders to the same machine code as a direct register access.
+我们返回的GpioConfig在运行时永远不会存在。调用此函数实际上就是一条汇编指令-将一个常量写入到寄存器中。这意味着我们开发的类型状态机接口是一种零成本的抽象方法(zero cost abstraction)-它不需要使用CPU，RAM或代码空间来跟踪`GpioConfig`的状态，最终优化后与手写的直接写寄存器的代码相同。
 
-## Nesting
+## 嵌套
 
-In general, these abstractions may be nested as deeply as you would like. As long as all components used are zero sized types, the whole structure will not exist at runtime.
+通常，这些抽象对象可以任意嵌套,只要使用的所有对象都是零大小的类型，整个结构体在运行时就不会存在。
 
-For complex or deeply nested structures, it may be tedious to define all possible combinations of state. In these cases, macros may be used to generate all implementations.
+对于复杂或深度嵌套的结构，定义状态的所有可能组合会很繁琐, 这时可以借助宏生成所有的状态。

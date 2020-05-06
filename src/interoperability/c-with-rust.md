@@ -1,21 +1,21 @@
-# A little C with your Rust
+# Rust中使用C代码
 
-Using C or C++ inside of a Rust project consists of two major parts:
+在Rust项目中使用C或C++代码包含两个主要部分：
 
-- Wrapping the exposed C API for use with Rust
-- Building your C or C++ code to be integrated with the Rust code
+- 封装导出的的C API以供Rust调用
+- 构建要与Rust代码集成的C或C++代码
 
-As C++ does not have a stable ABI for the Rust compiler to target, it is recommended to use the `C` ABI when combining Rust with C or C++.
+由于C++没有稳定的ABI，因此将Rust与C或C++结合使用时，建议使用`C` ABI。
 
-## Defining the interface
+## 定义接口
 
-Before consuming C or C++ code from Rust, it is necessary to define (in Rust) what data types and function signatures exist in the linked code. In C or C++, you would include a header (`.h` or `.hpp`) file which defines this data. In Rust, it is necessary to either manually translate these definitions to Rust, or use a tool to generate these definitions.
+在Rust中使用C或C++代码之前，有必要定义(用Rust编写)这些代码中存在哪些数据类型和函数。在C或C++中使用这些代码时，您需要包含定义相关的头文件(“.h”或“.hpp”)。在Rust中，需要将这些头文件手动转换为Rust代码，或使用工具生成。
 
-First, we will cover manually translating these definitions from C/C++ to Rust.
+首先，我们将介绍如何将这些代码从C/C++手动转换为Rust。
 
-### Wrapping C functions and Datatypes
+### 封装C函数和数据类型
 
-Typically, libraries written in C or C++ will provide a header file defining all types and functions used in public interfaces. An example file may look like this:
+通常，用C或C++编写的库将提供头文件，该头文件定义公共接口中使用的所有类型和函数。比如下面的例子：
 
 ```C
 /* File: cool.h */
@@ -27,9 +27,9 @@ typedef struct CoolStruct {
 void cool_function(int i, char c, CoolStruct* cs);
 ```
 
-When translated to Rust, this interface would look as such:
+转换为Rust后，代码如下所示：
 
-```rust,ignore
+```rust , ignore
 /* File: cool_bindings.rs */
 #[repr(C)]
 pub struct CoolStruct {
@@ -44,83 +44,86 @@ pub extern "C" fn cool_function(
 );
 ```
 
-Let's take a look at this definition one piece at a time, to explain each of the parts.
+让我们一次查看一个定义，以解释每个部分。
 
-```rust,ignore
+
+```rust , ignore
 #[repr(C)]
 pub struct CoolStruct { ... }
 ```
 
-By default, Rust does not guarantee order, padding, or the size of data included in a `struct`. In order to guarantee compatibility with C code, we include the `#[repr(C)]` attribute, which instructs the Rust compiler to always use the same rules C does for organizing data within a struct.
 
-```rust,ignore
+默认情况下，Rust不保证`struct`中包含的数据的顺序，填充或大小。为了保证与C代码的兼容性，我们加入了`#[repr(C)]` 属性，该属性指示Rust编译器使用C规则来组织结构体中的数据。
+
+
+```rust , ignore
 pub x: cty::c_int,
 pub y: cty::c_int,
 ```
 
-Due to the flexibility of how C or C++ defines an `int` or `char`, it is recommended to use primitive data types defined in `cty`, which will map types from C to types in Rust
+由于C/C++中`int`和`char`类型的灵活性，建议使用`cty`中定义的原始数据类型，它将原始类型从C映射到Rust中的类型。
 
-```rust,ignore
+```rust , ignore
 pub extern "C" fn cool_function( ... );
 ```
 
-This statement defines the signature of a function that uses the C ABI, called `cool_function`. By defining the signature without defining the body of the function, the definition of this function will need to be provided elsewhere, or linked into the final library or binary from a static library.
+该语句定义使用C ABI的函数的签名，称为“ cool_function”。这里只定义了签名，需要在其他位置提供此函数的定义，或者将其链接到相关的动态或者库文件中。
 
-```rust,ignore
+```rust , ignore
     i: cty::c_int,
     c: cty::c_char,
     cs: *mut CoolStruct
 ```
 
-Similar to our datatype above, we define the datatypes of the function arguments using C-compatible definitions. We also retain the same argument names, for clarity.
+与上面的数据类型类似，我们使用C兼容的定义来定义函数参数的数据类型。为了清楚起见，我们还保留相同的参数名称。
 
-We have one new type here, `*mut CoolStruct`. As C does not have a concept of Rust's references, which would look like this: `&mut CoolStruct`, we instead have a raw pointer. As dereferencing this pointer is `unsafe`, and the pointer may in fact be a `null` pointer, care must be taken to ensure the guarantees typical of Rust when interacting with C or C++ code.
+我们这里有一种新类型，即`*mut CoolStruct`。由于C没有Rust引用的概念：`＆mut CoolStruct`，因此我们有一个裸指针。由于解引用此指针是“不安全的”，并且实际上该指针可能是“空”指针，因此在与C或C++代码进行交互时，必须小心确保Rust的典型保证。
 
-### Automatically generating the interface
+### 自动生成接口
 
-Rather than manually generating these interfaces, which may be tedious and error prone, there is a tool called [bindgen] which will perform these conversions automatically. For instructions of the usage of [bindgen], please refer to the [bindgen user's manual], however the typical process consists of the following:
+相比手动生成这些接口(可能很乏味且容易出错)，可以使用一种名为[bindgen]的工具来自动执行这些转换。有关[bindgen]用法的说明，请参阅[bindgen用户手册]，但是典型过程包括以下内容：
 
-1. Gather all C or C++ headers defining interfaces or datatypes you would like to use with Rust
-2. Write a `bindings.h` file, which `#include "..."`'s each of the files you gathered in step one
-3. Feed this `bindings.h` file, along with any compilation flags used to compile
-  your code into `bindgen`. Tip: use `Builder.ctypes_prefix("cty")` /
-  `--ctypes-prefix=cty` and `Builder.use_core()` to make the generated code `#![no_std]` compatible.
-4. `bindgen` will produce the generated Rust code to the output of the terminal window. This file may be piped to a file in your project, such as `bindings.rs`. You may use this file in your Rust project to interact with C/C++ code compiled and linked as an external library. Tip: don't forget to use the [`cty`](https://crates.io/crates/cty) crate if your types in the generated bindings are prefixed with `cty`.
+1. 收集所有要在Rust中使用的接口或数据类型的C或C++头文件
+2. 编写一个“bindings.h”文件，其中的“ #include“ ...”`是您在第一步中收集的每个文件。
+3. 将此“bindings.h”文件以及用于编译的所有编译标志提供给`bindgen`。注意使用``Builder.ctypes_prefix("cty")` /
+  `--ctypes-prefix=cty`和`Builder.use_core()` ,这样生成的代码才能和`#![no_std]` 兼容。
+4. `bindgen`将生成的Rust代码生成输出到终端。该输出可以通过管道重定向到文件，例如“ bindings.rs”。您可以在Rust项目中使用此文件与作为外部库编译和链接的C/C ++代码进行交互。提示：如果生成的绑定中的类型以`cty`作为前缀，请不要忘记使用[`cty`](https://crates.io/crates/cty)crate。
 
 [bindgen]: https://github.com/rust-lang/rust-bindgen
-[bindgen user's manual]: https://rust-lang.github.io/rust-bindgen/
+[bindgen用户手册]: https://rust-lang.github.io/rust-bindgen/
 
-## Building your C/C++ code
+## 构建C / C ++代码
 
-As the Rust compiler does not directly know how to compile C or C++ code (or code from any other language, which presents a C interface), it is necessary to compile your non-Rust code ahead of time.
+由于Rust编译器不知道如何编译C或C++代码(或来自任何其他语言的代码，只要提供C接口即可)，因此有必要提前编译非Rust代码。
 
-For embedded projects, this most commonly means compiling the C/C++ code to a static archive (such as `cool-library.a`), which can then be combined with your Rust code at the final linking step.
+对于嵌入式项目，这通常意味着将C/C ++代码编译为静态归档文件(例如“cool-library.a”)，然后可以在最后的链接步骤将其与Rust代码合并。
 
-If the library you would like to use is already distributed as a static archive, it is not necessary to rebuild your code. Just convert the provided interface header file as described above, and include the static archive at compile/link time.
+如果您要使用的库已经作为静态库分发，则无需重新构建代码。只需像上面提到的转换接口文件，并在编译/链接时包含静态库文件。
 
-If your code exists as a source project, it will be necessary to compile your C/C++ code to a static library, either by triggering your existing build system (such as `make`, `CMake`, etc.), or by porting the necessary compilation steps to use a tool called the `cc` crate. For both of these steps, it is necessary to use a `build.rs` script.
+如果您依赖的代码以源代码形式提供，则必须先用现有的构建系统(例如“ make”，“ CMake”等)编译,或者移植编译过程使用`cc` crate进行编译。对于这两种情况，都需要使用一个build.rs脚本。
 
-### Rust `build.rs` build scripts
+### Rust`build.rs`构建脚本
 
-A `build.rs` script is a file written in Rust syntax, that is executed on your compilation machine, AFTER dependencies of your project have been built, but BEFORE your project is built.
+`build.rs`脚本是用Rust语法编写的文件，该文件在编译机上执行，在构建完项目本身的依赖项之后，但在构建项目本身之前。
 
-The full reference may be found [here](https://doc.rust-lang.org/cargo/reference/build-scripts.html). `build.rs` scripts are useful for generating code (such as via [bindgen]), calling out to external build systems such as `Make`, or directly compiling C/C++ through use of the `cc` crate
+完整的参考资料可以在[这里](https://doc.rust-lang.org/cargo/reference/build-scripts.html)中找到。 `build.rs`脚本对于生成代码(例如通过[bindgen])，调用外部构建系统(例如Make)或通过使用`cc` crate直接编译C/C ++非常有用。
 
-### Triggering external build systems
+### 调用外部构建系统
 
-For projects with complex external projects or build systems, it may be easiest to use [`std::process::Command`] to "shell out" to your other build systems by traversing relative paths, calling a fixed command (such as `make library`), and then copying the resulting static library to the proper location in the `target` build directory.
+对于复杂的项目，最简单的方法是使用[`std::process::Command`]遍历相对路径，调用固定命令(例如`make library`，然后将生成的静态库复制到`target`目录中的正确位置。
 
-While your crate may be targeting a `no_std` embedded platform, your `build.rs` executes only on machines compiling your crate. This means you may use any Rust crates which will run on your compilation host.
+虽然你自己的项目以`no_std`嵌入式平台为目标，但是`build.rs`仅在执行编译的计算机上执行。这意味着您可以在`build.rs`中使用编译主机上的任何Rust crate。
 
-### Building C/C++ code with the `cc` crate
+### 使用`cc` crate构建C/C ++代码
 
-For projects with limited dependencies or complexity, or for projects where it is difficult to modify the build system to produce a static library (rather than a final binary or executable), it may be easier to instead utilize the [`cc` crate], which provides an idiomatic Rust interface to the compiler provided by the host.
+对于不太复杂或者依赖较少的项目，或者难以修改构建系统以生成静态库(而不是最终的二进制文件或可执行文件)的项目，使用[`cc` crate]可能会更容易，它为主机提供的编译器封装了惯用的Rust接口。
 
-[`cc` crate]: https://github.com/alexcrichton/cc-rs
+[`cc` crate]:https://github.com/alexcrichton/cc-rs
 
-In the simplest case of compiling a single C file as a dependency to a static library, an example `build.rs` script using the [`cc` crate] would look like this:
 
-```rust,ignore
+对于只有一个c文件的静态库的最简单情况,下面给出一个使用[`cc` crate]的示例:
+
+```rust , ignore
 extern crate cc;
 
 fn main() {

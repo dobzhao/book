@@ -1,62 +1,65 @@
-# Portability
+# 可移植性
 
-In embedded environments portability is a very important topic: Every vendor and even each family from a single manufacturer offers different peripherals and capabilities and similarly the ways to interact with the peripherals will vary.
+在嵌入式环境中，可移植性是一个非常重要的主题：不同厂商，甚至同一厂商的不同家族的微控制器都提供不同的外围设备和功能，并且与这些外围设备进行交互的方式也会有所不同。
 
-A common way to equalize such differences is via a layer called Hardware Abstraction layer or **HAL**.
+填平这种差异的常用方法是通过硬件抽象层(**HAL**)。
 
-> Hardware abstractions are sets of routines in software that emulate some platform-specific details, giving programs direct access to the hardware resources.
+>硬件抽象层是一组例程，它们可以模拟某些特定平台的详细信息，从而使程序可以直接访问硬件资源。
 >
-> They often allow programmers to write device-independent, high performance applications by providing standard operating system (OS) calls to hardware.
+>通过提供对硬件的标准操作系统(OS)调用，从而允许程序员编写与设备无关的高性能应用程序。
 >
-> *Wikipedia: [Hardware Abstraction Layer]*
+> *维基百科：[硬件抽象层] *
 
-[Hardware Abstraction Layer]: https://en.wikipedia.org/wiki/Hardware_abstraction
+[硬件抽象层]:https://en.wikipedia.org/wiki/Hardware_abstraction
 
-Embedded systems are a bit special in this regard since we typically do not have operating systems and user installable software but firmware images which are compiled as a whole as well as a number of other constraints. So while the traditional approach as defined by Wikipedia could potentially work it is likely not the most productive approach to ensure portability.
+嵌入式系统在这方面有点特殊，因为他们通常没有操作系统,也不允许用户安装自己的软件. 并且固件映像是作为一个整体编译的，此外还有许多其他限制。因此尽管维基百科定义的传统方法可能可行，但它很可能不是确保可移植性的最有效的方法。
 
-How do we do this in Rust? Enter **embedded-hal**...
+我们如何在Rust中做到这一点？那就是**embedded-hal** ...
 
-## What is embedded-hal?
+## 什么是Embedded-hal？
 
-In a nutshell it is a set of traits which define implementation contracts between **HAL implementations**, **drivers** and **applications (or firmwares)**. Those contracts include both capabilities (i.e. if a trait is implemented for a certain type, the **HAL implementation** provides a certain capability) and methods (i.e. if you can construct a type implementing a trait it is guaranteed that you have the methods specified in the trait available).
+简而言之，它是一组Trait，它们定义了**HAL实现**，**驱动程序**和**应用程序**(或**固件**)之间的实现合约。这些合约包括功能(如果为某种类型实现了某种Trait，**HAL实现**会提供某种能力)和方法(如果某种类型实现了某个Trait,HAL确保这个Trait指定的方法可用)。
 
-A typical layering might look like this:
+典型的分层可能如下所示：
 
 ![](../assets/rust_layers.svg)
 
-Some of the defined traits in **embedded-hal** are:
-* GPIO (input and output pins)
-* Serial communication
+**Embedded-hal**部分预定义的Trait有:
+* GPIO(输入和输出引脚)
+* 串行通讯
 * I2C
 * SPI
-* Timers/Countdowns
-* Analog Digital Conversion
+* 计时器/倒数计数器
+* 模拟数字转换
 
-The main reason for having the **embedded-hal** traits and crates implementing and using them is to keep complexity in check. If you consider that an application might have to implement the use of the peripheral in the hardware as well as the application and potentially drivers for additional hardware components, then it should be easy to see that the re-usability is very limited. Expressed mathematically, if **M** is the number of peripheral HAL implementations and **N** the number of drivers then if we were to reinvent the wheel for every application then we would end up with **M*N** implementations while by using the *API* provided by the **embedded-hal** traits will make the implementation complexity approach **M+N**. Of course there're additional benefits to be had, such as less trial-and-error due to a well-defined and ready-to-use APIs.
+使用**embedded-hal**的Trait和crate的主要原因是为了控制复杂性。如果某个应用程序自己必须独立实现外设的使用方法,独立编写应用程序以及潜在的其硬件驱动程序，那么应该很容易看出其代码可重用性非常有限。如果**M**是外设HAL实现的数量，而**N**是驱动程序的数量，那么如果我们要为每个应用重新发明轮子，那么最终将得到**M\*N**种实现. 而使用基于**Embedded-hal**提供的Trait的API来实现，则只需**M+N**种实现。当然还有其他好处，例如由于定义明确且易于使用的API，减少了反复试验。
 
-## Users of the embedded-hal
+## embedded-hal的使用者
 
-As said above there are three main users of the HAL:
+如上所述，HAL主要有三个使用者：
 
-### HAL implementation
+### HAL实现
 
-A HAL implementation provides the interfacing between the hardware and the users of the HAL traits. Typical implementations consist of three parts:
-* One or more hardware specific types
-* Functions to create and initialize such a type, often providing various configuration options (speed, operation mode, use pins, etc.)
-* one or more `trait` `impl` of **embedded-hal** traits for that type
+HAL实现提供了硬件与HAL trait的用户之间的接口。典型的实现包括三个部分：
+* 一种或多种硬件相关的数据类型
+* 创建和初始化这种类型的函数，通常提供各种配置选项(速度，操作模式，引脚等)
+* 为该类型实现**embedded-hal**定义的一个或者多个trait
 
-Such a **HAL implementation** can come in various flavours:
-* Via low-level hardware access, e.g. via registers
-* Via operating system, e.g. by using the `sysfs` under Linux
-* Via adapter, e.g. a mock of types for unit testing
-* Via driver for hardware adapters, e.g. I2C multiplexer or GPIO expander
+这样的**HAL实现**可以有多种形式：
 
-### Driver
+* 通过低级别的硬件访问，例如通过寄存器
+* 通过操作系统，例如在Linux下使用`sysfs`
+* 通过适配器，例如模拟单元测试的类型
+* 通过硬件适配器的驱动程序，例如I2C多路复用器或GPIO扩展器
 
-A driver implements a set of custom functionality for an internal or external component, connected to a peripheral implementing the embedded-hal traits. Typical examples for such drivers include various sensors (temperature, magnetometer, accelerometer, light), display devices (LED arrays, LCD displays) and actuators (motors, transmitters).
+### 驱动
+
+驱动程序为内部或外部组件实现了一组自定义功能，这些组件连接到实现了嵌入式hal trait的外围设备。这种驱动程序的典型示例包括各种传感器(温度，磁力计，加速度计，光线)，显示设备(LED阵列，LCD显示屏)和驱动器(电机，发射器)。
+
+一个驱动程序必须用一个类型实例来初始化，该类型实现了Embedded-hal的某个“trait”，这是通过特征绑定来确保的，并为其自身的类型实例提供一组自定义方法，以允许与被驱动设备进行交互。
 
 A driver has to be initialized with an instance of type that implements a certain `trait` of the embedded-hal which is ensured via trait bound and provides its own type instance with a custom set of methods allowing to interact with the driven device.
 
-### Application
+### 应用
 
-The application binds the various parts together and ensures that the desired functionality is achieved. When porting between different systems, this is the part which requires the most adaptation efforts, since the application needs to correctly initialize the real hardware via the HAL implementation and the initialisation of different hardware differs, sometimes drastically so. Also the user choice often plays a big role, since components can be physically connected to different terminals, hardware buses sometimes need external hardware to match the configuration or there are different trade-offs to be made in the use of internal peripherals (e.g. multiple timers with different capabilities are available or peripherals conflict with others).
+该应用程序将各个部分绑定在一起，并确保实现所需的功能。在不同系统之间进行移植时，这是需要花费大量精力的部分，因为应用程序需要通过HAL实现正确地初始化实际硬件，并且不同硬件的初始化有时甚至完全不同。另外，用户的选择通常也起着很大的作用，因为组件可以连接到不同的终端，有时硬件总线需要外部硬件来匹配配置，或者在使用内部外设时需要进行不同的权衡(例如，多个具有不同功能的定时器或外设之间互相冲突)。

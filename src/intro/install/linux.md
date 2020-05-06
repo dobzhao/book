@@ -1,15 +1,15 @@
 # Linux
 
-Here are the installation commands for a few Linux distributions.
+这是一些Linux发行版的安装命令。
 
-## Packages
+## 安装包
 
-- Ubuntu 18.04 or newer / Debian stretch or newer
+- Ubuntu 18.04或更高版本/Debian Stretch或更高版本
 
-> **NOTE** `gdb-multiarch` is the GDB command you'll use to debug your ARM
-> Cortex-M programs
+> **注意**`gdb-multiarch`是用于调试ARM的GDB命令
+> Cortex-M程序
 
-<!-- Debian stretch -->
+ <!-- Debian stretch -->
 <!-- GDB 7.12 -->
 <!-- OpenOCD 0.9.0 -->
 <!-- QEMU 2.8.1 -->
@@ -19,52 +19,52 @@ Here are the installation commands for a few Linux distributions.
 <!-- OpenOCD 0.10.0 -->
 <!-- QEMU 2.11.1 -->
 
-``` console
+```sh
 sudo apt install gdb-multiarch openocd qemu-system-arm
 ```
 
-- Ubuntu 14.04 and 16.04
+- Ubuntu 14.04和16.04
 
-> **NOTE** `arm-none-eabi-gdb` is the GDB command you'll use to debug your ARM
-> Cortex-M programs
+> **注意**`arm-none-eabi-gdb`是用于调试ARM的GDB命令
+> Cortex-M程序
 
-<!-- Ubuntu 14.04 -->
-<!-- GDB 7.6 (!) -->
-<!-- OpenOCD 0.7.0 (?) -->
-<!-- QEMU 2.0.0 (?) -->
+<！-Ubuntu 14.04->
+<！-GDB 7.6(！)->
+<！-OpenOCD 0.7.0(？)->
+<！-QEMU 2.0.0(？)->
 
-``` console
+```sh
 sudo apt install gdb-arm-none-eabi openocd qemu-system-arm
 ```
 
-- Fedora 27 or newer
+- Fedora 27或更高版本
 
-> **NOTE** `arm-none-eabi-gdb` is the GDB command you'll use to debug your ARM
-> Cortex-M programs
+> **注意**`arm-none-eabi-gdb`是用于调试ARM的GDB命令
+> Cortex-M程序
 
 <!-- Fedora 27 -->
 <!-- GDB 7.6 (!) -->
 <!-- OpenOCD 0.10.0 -->
 <!-- QEMU 2.10.2 -->
 
-``` console
+```sh
 sudo dnf install arm-none-eabi-gdb openocd qemu-system-arm
 ```
 
 - Arch Linux
 
-> **NOTE** `arm-none-eabi-gdb` is the GDB command you'll use to debug ARM
-> Cortex-M programs
+> **注意**`arm-none-eabi-gdb`是用于调试ARM的GDB命令
+> Cortex-M程序
 
 ``` console
 sudo pacman -S arm-none-eabi-gdb qemu-arch-extra openocd
 ```
 
-## udev rules
+## udev规则
 
-This rule lets you use OpenOCD with the Discovery board without root privilege.
+该规则使您可以在没有root特权的情况下将OpenOCD与Discovery开发板一起使用。
 
-Create the file `/etc/udev/rules.d/70-st-link.rules` with the contents shown below.
+创建文件`/etc/udev/rules.d/70-st-link.rules`，内容如下所示。
 
 ``` text
 # STM32F3DISCOVERY rev A/B - ST-LINK/V2
@@ -74,21 +74,22 @@ ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", TAG+="uaccess"
 ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", TAG+="uaccess"
 ```
 
-Then reload all the udev rules with:
+
+然后使用以下命令重新加载所有udev规则：
 
 ``` console
 sudo udevadm control --reload-rules
 ```
 
-If you had the board plugged to your laptop, unplug it and then plug it again.
+如果您将主板插入笔记本电脑，请先拔下电源，然后再重新插入。
 
-You can check the permissions by running this command:
+您可以通过运行以下命令来检查权限：
 
-``` console
+```sh
 lsusb
 ```
 
-Which should show something like
+应该显示类似结果:
 
 ```text
 (..)
@@ -96,8 +97,7 @@ Bus 001 Device 018: ID 0483:374b STMicroelectronics ST-LINK/V2.1
 (..)
 ```
 
-Take note of the bus and device numbers. Use those numbers to create a path like
-`/dev/bus/usb/<bus>/<device>`. Then use this path like so:
+记下总线和设备号,然后像这样使用路径`/dev/bus/usb/<bus>/<device>`：
 
 ``` console
 ls -l /dev/bus/usb/001/018
@@ -116,10 +116,8 @@ user::rw-
 user:you:rw-
 ```
 
-The `+` appended to permissions indicates the existence of an extended
-permission. The `getfacl` command tells the user `you` can make use of
-this device.
+权限后面的“ +”表示存在扩展权限。 “getfacl”命令告诉用户“您”可以使用此设备。
 
-Now, go to the [next section].
+现在，转到[下一部分]。
 
-[next section]: verify.md
+[下一部分]:verify.md

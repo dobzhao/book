@@ -1,51 +1,33 @@
-# Panicking
+# 恐慌(Panicking)
 
-Panicking is a core part of the Rust language. Built-in operations like indexing
-are runtime checked for memory safety. When out of bounds indexing is attempted
-this results in a panic.
+恐慌是Rust语言的核心部分。诸如索引之类的内置操作会在运行时检查内存安全性。当尝试超出索引范围时，这将导致恐慌。
 
-In the standard library panicking has a defined behavior: it unwinds the stack
-of the panicking thread, unless the user opted for aborting the program on
-panics.
+在标准库中，恐慌具有确定的行为：恐慌会进行线程栈展开，除非用户选择在恐慌中中止程序。
 
-In programs without standard library, however, the panicking behavior is left
-undefined. A behavior can be chosen by declaring a `#[panic_handler]` function.
-This function must appear exactly *once* in the dependency graph of a program,
-and must have the following signature: `fn(&PanicInfo) -> !`, where [`PanicInfo`]
-is a struct containing information about the location of the panic.
+但是，在没有标准库的程序中，恐慌行为未定义。可以通过声明一个 `#[panic_handler]` 函数来选择一种行为。该函数必须在程序的依赖关系中恰好出现一次，并且必须具有以下签名：`fn(＆PanicInfo)->！`，其中[`PanicInfo`]包含有恐慌相关的位置信息 。
 
-[`PanicInfo`]: https://doc.rust-lang.org/core/panic/struct.PanicInfo.html
+[`PanicInfo`]:https://doc.rust-lang.org/core/panic/struct.PanicInfo.html
 
-Given that embedded systems range from user facing to safety critical (cannot
-crash) there's no one size fits all panicking behavior but there are plenty of
-commonly used behaviors. These common behaviors have been packaged into crates
-that define the `#[panic_handler]` function. Some examples include:
+鉴于嵌入式系统的范围广泛,从消费类电子到对安全至关重要的系统(不能崩溃)，因此没有一种适合所有场景的恐慌处理行为，但是有许多常用行为。这些常见的行为已被打包到定义 `#[panic_handler]` 功能的crate中,常见的包括：
 
-- [`panic-abort`]. A panic causes the abort instruction to be executed.
-- [`panic-halt`]. A panic causes the program, or the current thread, to halt by
-  entering an infinite loop.
-- [`panic-itm`]. The panicking message is logged using the ITM, an ARM Cortex-M
-  specific peripheral.
-- [`panic-semihosting`]. The panicking message is logged to the host using the
-  semihosting technique.
+- [`panic-abort`] 恐慌时会执行abort指令。
+- [`panic-halt`] 恐慌时会导致程序或者其所在线程通过进入死循环的方式停止。
+- [`panic-itm`] 恐慌消息使用ITM(ARM Cortex-M特定的外围设备)记录。
+- [`panic-semihosting`] 恐慌消息使用半主机技术记录到主机。
 
-[`panic-abort`]: https://crates.io/crates/panic-abort
-[`panic-halt`]: https://crates.io/crates/panic-halt
-[`panic-itm`]: https://crates.io/crates/panic-itm
-[`panic-semihosting`]: https://crates.io/crates/panic-semihosting
+[`panic-abort`]:https：//crates.io/crates/panic-abort
+[`panic-halt`]:https://crates.io/crates/panic-halt
+[`panic-itm`]:https://crates.io/crates/panic-itm
+[`panic-semihosting`]:https://crates.io/crates/panic-semihosting
 
-You may be able to find even more crates searching for the [`panic-handler`]
-keyword on crates.io.
+在crates.io上搜索[`panic-handler`]，您也许可以找到更多的crate。
 
-[`panic-handler`]: https://crates.io/keywords/panic-handler
+[`panic-handler`]:https://crates.io/keywords/panic-handler
 
-A program can pick one of these behaviors simply by linking to the corresponding
-crate. The fact that the panicking behavior is expressed in the source of
-an application as a single line of code is not only useful as documentation but
-can also be used to change the panicking behavior according to the compilation
-profile. For example:
+程序可以简单地通过链接到相应的crate来选择其中一种行为,还可以根据编译配置文件更改恐慌行为。例如：
 
-``` rust,ignore
+
+``` rust , ignore
 #![no_main]
 #![no_std]
 
@@ -60,16 +42,13 @@ extern crate panic_abort;
 // ..
 ```
 
-In this example the crate links to the `panic-halt` crate when built with the
-dev profile (`cargo build`), but links to the `panic-abort` crate when built
-with the release profile (`cargo build --release`).
+在此示例中，使用开发人员配置文件(`cargo build`)时，板条箱链接到`panic-halt`板条箱，而当使用发布配置文件构建时，则链接到`panic-abort`板条箱(`cargo build --release `)。
 
-## An example
+##  一个例子
 
-Here's an example that tries to index an array beyond its length. The operation
-results in a panic.
+这是一个尝试索引超出的示例。该操作导致恐慌。
 
-```rust,ignore
+```rust , ignore
 #![no_main]
 #![no_std]
 
@@ -87,8 +66,7 @@ fn main() -> ! {
 }
 ```
 
-This example chose the `panic-semihosting` behavior which prints the panic
-message to the host console using semihosting.
+本示例选择了`panic-semihosting`恐慌处理行为，该行为将恐慌消息打印到主机控制台。
 
 ``` console
 $ cargo run
@@ -96,5 +74,4 @@ $ cargo run
 panicked at 'index out of bounds: the len is 3 but the index is 4', src/main.rs:12:13
 ```
 
-You can try changing the behavior to `panic-halt` and confirm that no message is
-printed in that case.
+您可以尝试将行为更改为`panic-halt` ，并确认在这种情况下不打印任何消息。

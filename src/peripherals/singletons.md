@@ -1,17 +1,18 @@
-# Singletons
+# 单例
 
-> In software engineering, the singleton pattern is a software design pattern that restricts the instantiation of a class to one object.
+>在软件工程中，单例模式是一种软件设计模式，它限制类只有一个实例。
 >
-> *Wikipedia: [Singleton Pattern]*
+> *维基百科：[单例模式] *
 
-[Singleton Pattern]: https://en.wikipedia.org/wiki/Singleton_pattern
+[单例模式]:https：//en.wikipedia.org/wiki/Singleton_pattern
 
 
-## But why can't we just use global variable(s)?
+## 为什么我们不能直接使用全局变量？
 
-We could make everything a public static, like this
+我们可以像这样将所有内容设为公共静态
 
-```rust,ignore
+
+```rust , ignore
 static mut THE_SERIAL_PORT: SerialPort = SerialPort;
 
 fn main() {
@@ -21,13 +22,14 @@ fn main() {
 }
 ```
 
-But this has a few problems. It is a mutable global variable, and in Rust, these are always unsafe to interact with. These variables are also visible across your whole program, which means the borrow checker is unable to help you track references and ownership of these variables.
 
-## How do we do this in Rust?
+但这有一些问题。它是一个可变的全局变量，在Rust中，与它们进行交互总是不安全的。这些变量在整个程序中也是可见的，这意味着借用检查器无法帮助您跟踪这些变量的引用和所有权。
 
-Instead of just making our peripheral a global variable, we might instead decide to make a global variable, in this case called `PERIPHERALS`, which contains an `Option<T>` for each of our peripherals.
+## 我们如何在Rust中做到这一点？
 
-```rust,ignore
+我们不是简单地将外设设为全局变量，而是创建一个全局变量，姑且称为“PERIPHERALS”，其中每个外围设备都包含一个“Option <T>”。
+
+```rust , ignore
 struct Peripherals {
     serial: Option<SerialPort>,
 }
@@ -42,9 +44,9 @@ static mut PERIPHERALS: Peripherals = Peripherals {
 };
 ```
 
-This structure allows us to obtain a single instance of our peripheral. If we try to call `take_serial()` more than once, our code will panic!
+这种结构使我们可以获得外围设备的单个实例。如果我们尝试多次调用`take_serial()`，代码将会崩溃！
 
-```rust,ignore
+```rust , ignore
 fn main() {
     let serial_1 = unsafe { PERIPHERALS.take_serial() };
     // This panics!
@@ -52,15 +54,16 @@ fn main() {
 }
 ```
 
-Although interacting with this structure is `unsafe`, once we have the `SerialPort` it contained, we no longer need to use `unsafe`, or the `PERIPHERALS` structure at all.
+尽管与此结构进行交互是`unsafe`，但一旦取得了它内部的“SerialPort”，我们将不再需要使用`unsafe`或`PERIPHERALS`结构体。
 
-This has a small runtime overhead because we must wrap the `SerialPort` structure in an option, and we'll need to call `take_serial()` once, however this small up-front cost allows us to leverage the borrow checker throughout the rest of our program.
+这具有很小的运行时开销，因为我们必须将`SerialPort`结构包装在一个Option中，并且需要调用一次`take_serial()`，但是，这笔小小的前期成本使我们能够在其余所有过程中利用借用检查器检查我们的程序。
 
-## Existing library support
+## 现有库支持
 
-Although we created our own `Peripherals` structure above, it is not necessary to do this for your code. the `cortex_m` crate contains a macro called `singleton!()` that will perform this action for you.
+尽管我们在上面创建了自己的`Peripherals`结构体，但实际上你的代码中无需这么操作。 `cortex_m`crate包含一个名为`singleton!()`的宏，它将为您执行此操作。
 
-```rust,ignore
+
+```rust , ignore
 #[macro_use(singleton)]
 extern crate cortex_m;
 
@@ -73,9 +76,9 @@ fn main() {
 
 [cortex_m docs](https://docs.rs/cortex-m/latest/cortex_m/macro.singleton.html)
 
-Additionally, if you use `cortex-m-rtfm`, the entire process of defining and obtaining these peripherals are abstracted for you, and you are instead handed a `Peripherals` structure that contains a non-`Option<T>` version of all of the items you define.
+此外，如果您使用`cortex-m-rtfm`， 定义和获取这些外围设备的整个过程已经帮您封装好了，您将获得一个`Peripherals`结构，该结构包含非`Option <T>`版本的您定义的所有项目。
 
-```rust,ignore
+```rust , ignore
 // cortex-m-rtfm v0.3.x
 app! {
     resources: {
@@ -91,11 +94,11 @@ fn init(p: init::Peripherals) -> init::LateResources {
 
 [japaric.io rtfm v3](https://blog.japaric.io/rtfm-v3/)
 
-## But why?
+##  但为什么？
 
-But how do these Singletons make a noticeable difference in how our Rust code works?
+但是这些单例化能产生什么显著不同?
 
-```rust,ignore
+```rust , ignore
 impl SerialPort {
     const SER_PORT_SPEED_REG: *mut u32 = 0x4000_1000 as _;
 
@@ -109,14 +112,15 @@ impl SerialPort {
 }
 ```
 
-There are two important factors in play here:
+这里有两个重要因素：
 
-* Because we are using a singleton, there is only one way or place to obtain a `SerialPort` structure
-* To call the `read_speed()` method, we must have ownership or a reference to a `SerialPort` structure
+* 因为我们使用的是单例，所以只有一种方法可以获得`SerialPort`实例
+* 要调用`read_speed()`方法，我们必须对`SerialPort`实例拥有借用或者所有权
 
-These two factors put together means that it is only possible to access the hardware if we have appropriately satisfied the borrow checker, meaning that at no point do we have multiple mutable references to the same hardware!
+这两个因素放在一起，再加上只有满足借用检查器的情况下，才可以访问硬件，这意味着我们绝对不会对同一硬件有多个可变引用！
 
-```rust,ignore
+
+```rust , ignore
 fn main() {
     // missing reference to `self`! Won't work.
     // SerialPort::read_speed();
@@ -128,13 +132,13 @@ fn main() {
 }
 ```
 
-## Treat your hardware like data
+## 将您的硬件视为数据
 
-Additionally, because some references are mutable, and some are immutable, it becomes possible to see whether a function or method could potentially modify the state of the hardware. For example,
+此外，由于某些引用是可变的，而有些则是不可变的，因此通过函数签名就可以判断是否可能潜在地修改硬件的状态。例如，
 
-This is allowed to change hardware settings:
+下面这个函数允许更改硬件设置：
 
-```rust,ignore
+```rust , ignore
 fn setup_spi_port(
     spi: &mut SpiPort,
     cs_pin: &mut GpioPin
@@ -143,12 +147,12 @@ fn setup_spi_port(
 }
 ```
 
-This isn't:
+下面这个则不可以：
 
-```rust,ignore
+```rust , ignore
 fn read_button(gpio: &GpioPin) -> bool {
     // ...
 }
 ```
 
-This allows us to enforce whether code should or should not make changes to hardware at **compile time**, rather than at runtime. As a note, this generally only works across one application, but for bare metal systems, our software will be compiled into a single application, so this is not usually a restriction.
+这使我们能够在编译时(而不是在运行时)限制代码是否应该更改硬件。需要注意的是，这通常仅适用于单个应用程序，但是对于裸机系统，我们的软件将被编译到单个应用程序中，因此不是问题。(这里说的是如果存在多个进程,它们可以分别构建单例,但是实际上外设只有一个,还是不安全)
