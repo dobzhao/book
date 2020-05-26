@@ -28,9 +28,9 @@ fn SysTick() {
 }
 ```
 
-如您所知，在函数中使用`static mut`变量使其成为[不可重入](https://en.wikipedia.org/wiki/Reentrancy_(computing))。 从多个异常/中断处理程序或`main`中直接或间接调用不可重入函数是不确定的行为。
+如您所知，使用`static mut`变量使函数[不可重入](https://en.wikipedia.org/wiki/Reentrancy_(computing))。 从多个异常/中断处理程序或`main`中直接或间接调用不可重入函数是不确定(UB undefined behavior)的行为。
 
-Safe Rust绝不能导致不确定的行为，因此非可重入函数必须标记为 `unsafe`。但是我刚刚却说异常处理程序可以安全地使用`static mut`变量。这怎么可能？这是可能的，因为异常处理程序不能被函数调用，因此无法重入。
+Safe Rust绝不能导致不确定的行为，因此非可重入函数必须标记为 `unsafe`。但是我刚刚却说异常处理程序可以安全地使用`static mut`变量。这怎么可能？这是可能的，因为异常处理程序不能被其他函数调用，因此不可能发生重入。
 
 ## 一个完整的例子
 
@@ -114,7 +114,7 @@ $ cargo run --release
 123456789
 ```
 
-如果在开发板上运行此命令，则会在OpenOCD控制台上看到输出。但是当计数达到9时，程序将**不**停止。
+如果在开发板上运行此命令，则会在OpenOCD控制台上看到输出。只不过当计数达到9时，程序将**不**停止。
 
 ## 默认异常处理程序
 
@@ -137,7 +137,7 @@ fn DefaultHandler(irqn: i16) {
 }
 ```
 
-irqn是正在处理的异常编号。负值表示Cortex-M异常；零或正值表示设备特定的异常，即AKA中断。
+irqn是正在处理的异常编号。负值表示Cortex-M异常；零或正值表示设备特定的异常，即中断。
 
 ## 硬故障处理程序
 
@@ -147,7 +147,7 @@ irqn是正在处理的异常编号。负值表示Cortex-M异常；零或正值�
 
 这是一个执行非法操作的示例：读取不存在的内存位置。
 
-> **注意**：该程序在QEMU上不起作用，即不会崩溃，因为`qemu-system-arm -machine lm3s6965evb`不会检查内存读取，并且在读取到无效内存时会很高兴地返回`0`。
+> **注意**：该程序在QEMU上不会发生崩溃，因为`qemu-system-arm -machine lm3s6965evb`不会检查内存读取，并且在读取到无效内存时会很高兴地返回`0`。
 
 
 ```rust , ignore
@@ -214,4 +214,4 @@ ResetTrampoline:
  800094c:       b       #-0x4 <ResetTrampoline+0xa>
 ```
 
-您可以在反汇编中查找程序计数器`0x0800094a` 的值。您将看到加载操作(`ldr r0，[r0]`)引起了异常。 `ExceptionFrame`的`r0`字段将告诉您寄存器r0的值为当时的0x3fff_fffe。
+您可以在反汇编中查找程序计数器`0x0800094a` 的值。您将看到加载操作(`ldr r0，[r0]`)引起了异常。 `ExceptionFrame`的`r0`字段将告诉您当时寄存器r0的值为0x3fff_fffe。

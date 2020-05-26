@@ -174,8 +174,9 @@ ELF Header:
 ```
 
 `cargo-size` can print the size of the linker sections of the binary.
+todo ! 可以提一个pr
 
-> **NOTE** this output assumes that rust-embedded/cortex-m-rt#111 has been
+> **NOTE** this output assumes that [rust-embedded/cortex-m-rt#111](https://github.com/rust-embedded/cortex-m-rt/pull/111) has been
 > merged
 
 ```console

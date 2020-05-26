@@ -10,9 +10,9 @@
 
 - ARM内核是否包括FPU？ Cortex-M4**F**和Cortex-M7**F**内核都有FPU。
 
--目标设备有多少闪存和RAM？例如256 KiB的闪存和32 KiB的RAM。
+- 目标设备有多少闪存和RAM？例如256 KiB的闪存和32 KiB的RAM。
 
--闪存和RAM映射的地址空间在哪里？例如RAM是通常位于地址“0x2000_0000”。
+- 闪存和RAM映射的地址空间在哪里？例如RAM通常位于地址“0x2000_0000”。
 
 通常您可以在数据手册或设备的参考手册中找到这些信息。
 
@@ -54,7 +54,7 @@ target = "thumbv7em-none-eabihf" # Cortex-M4F and Cortex-M7F (with FPU)
 ```
 
 
-我们将使用`thumbv7em-none-eabihf`，因为它适合Cortex-M4F内核。
+这次用得是Cortex-M4F内核,所以target使用`thumbv7em-none-eabihf` 。
 
 第二步是将存储区域信息输入到“memory.x”文件中。
 
@@ -69,7 +69,7 @@ MEMORY
 }
 ```
 
-确保`debug::exit()`调用已被注释掉或删除，因为他仅用于在QEMU中运行。
+确保`debug::exit()`调用已被注释掉或删除，因为他仅用于QEMU环境。
 
 ```rust , ignore
 #[entry]
@@ -84,7 +84,7 @@ fn main() -> ! {
 }
 ```
 
-现在，您可以像以前一样使用`cargo build`交叉编译程序，并使用`cargo-binutils`检查二进制文件。 `cortex-m-rt` crate可处理使您的芯片运行所需的所有魔术,几乎所有Cortex-M CPU都以相同的方式引导。
+现在，您可以像以前一样使用`cargo build`交叉编译程序，并使用`cargo-binutils`检查二进制文件。 `cortex-m-rt` crate可处理让您的芯片运行所需的所有魔术,几乎所有Cortex-M CPU都以相同的方式引导。
 
 ``` console
 $ cargo build --example hello
@@ -97,11 +97,11 @@ $ cargo build --example hello
 和以前一样，我们将进行远程调试，客户端是GDB进程,服务器将是OpenOCD。
 
 $ cat openocd.cfg
-按照[验证]部分的操作，将开发板连接到笔记本电脑或者PC，并检查是否填充了ST-LINK接头连接器(todo ... check that the ST-LINK header is populated)。
+按照[验证]部分的操作，将开发板连接到笔记本电脑或者PC，并检查是否插上了ST-LINK跳线帽。
 
 [验证]: ../intro/install/verify.md
 
-在终端上，运行“openocd”以连接到开发板上的ST-LINK。从模板的根目录运行此命令；`openocd`会根据`openocd.cfg`文件，找到要使用的接口文件和目标文件。
+在终端上，从模板的根目录运行“openocd”以连接到开发板上的ST-LINK。 `openocd`会根据`openocd.cfg`文件，找到要使用的接口文件和目标文件。
 
 ``` console
 $ cat openocd.cfg
@@ -150,7 +150,7 @@ Info : stm32f3x.cpu: hardware has 6 breakpoints, 4 watchpoints
 $ <gdb> -q target/thumbv7em-none-eabihf/debug/examples/hello
 ```
 
-接下来，将GDB连接到OpenOCD，OpenOCD正在监听端口3333,等待新的TCP连接。
+接下来，将GDB连接到OpenOCD，OpenOCD正在监听端口3333。
 
 ``` console
 (gdb) target remote :3333
@@ -169,7 +169,7 @@ Start address 0x800144e, load size 10380
 Transfer rate: 17 KB/sec, 3460 bytes/write.
 ```
 
-现在程序已加载。该程序使用半主机，因此在进行任何半主机调用之前，我们必须告诉OpenOCD启用半主机。您可以使用“ monitor”将命令发送到OpenOCD。
+现在程序已加载。该程序需要半主机支持，因此在进行任何半主机调用之前，我们必须告诉OpenOCD启用半主机。您可以使用“monitor”将命令发送到OpenOCD。
 
 ``` console
 (gdb) monitor arm semihosting enable
@@ -222,7 +222,7 @@ Info : halted: PC: 0x08000d70
 Info : halted: PC: 0x08000d72
 ```
 
-发出另一个`next`将使处理器执行`debug::exit`。这充当断点并中止该过程：
+发出另一个`next`将使处理器执行`debug::exit`。这会像断点一样挂起程序的执行：
 
 ``` console
 (gdb) next
@@ -244,7 +244,7 @@ target halted due to breakpoint, current mode: Thread
 xPSR: 0x21000000 pc: 0x08000d76 msp: 0x20009fc0, semihosting
 ```
 
-但是，在微控制器上运行的进程尚未终止，您可以使用`continue`或类似命令将其恢复。
+但是，在微控制器上运行的程序尚未终止，您可以使用`continue`或类似命令将其恢复。
 
 现在，您可以使用“ quit”命令退出GDB。
 
@@ -278,7 +278,7 @@ load
 stepi
 ```
 
-现在运行 `<gdb> -x openocd.gdb $program`将立即将GDB连接到OpenOCD，启用半主机，加载程序并启动该过程。
+现在运行 `<gdb> -x openocd.gdb $program`将立即将GDB连接到OpenOCD，启用半主机，加载程序并开始执行。
 
 您也可以将`<gdb> -x openocd.gdb`转换为自定义运行器，这样`cargo run`会自动构建程序并开始GDB会话。该运行器已包含在`.cargo/config`中，只不过现在是被注释掉的状态。
 

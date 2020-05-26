@@ -4,7 +4,7 @@
 
 使用micro-USB电缆将开发板连接到笔记本电脑/PC。开发板有两个USB接口。请使用位于板边缘中央的标有“USB ST-LINK”的USB接口。
 
-还要检查是否已拔掉ST-LINK跳线。见下图； ST-LINK标头用红色圈出。
+还要检查ST-LINK跳线是否连接。见下图； ST-LINK标头用红色圈出。
 
 <p align="center">
 <img title="Connected discovery board" src="../../assets/verify.jpeg">
@@ -54,7 +54,7 @@ $ openocd -f interface/stlink-v2.cfg -f target/stm32f3x.cfg
 
 如果这两个命令都不能作为普通用户使用，请尝试以root权限运行它们（例如`sudo openocd ..`）。如果这时可以正常工作，则请检查[udev规则]是否已正确设置。
 
-[udev规则]:linux.md# udev-rules
+[udev规则]:linux.md#udev-rules
 
 如果您到了这一步，OpenOCD无法正常工作，请提交一个[问题]，我们将为您提供帮助！
 

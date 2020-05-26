@@ -1,6 +1,6 @@
 # 恐慌(Panicking)
 
-恐慌是Rust语言的核心部分。诸如索引之类的内置操作会在运行时检查内存安全性。当尝试超出索引范围时，这将导致恐慌。
+恐慌是Rust语言的核心部分。诸如索引之类的内置操作会在运行时检查内存安全性。当尝试超出索引范围时，将导致恐慌。
 
 在标准库中，恐慌具有确定的行为：恐慌会进行线程栈展开，除非用户选择在恐慌中中止程序。
 
@@ -15,7 +15,7 @@
 - [`panic-itm`] 恐慌消息使用ITM(ARM Cortex-M特定的外围设备)记录。
 - [`panic-semihosting`] 恐慌消息使用半主机技术记录到主机。
 
-[`panic-abort`]:https：//crates.io/crates/panic-abort
+[`panic-abort`]:https://crates.io/crates/panic-abort
 [`panic-halt`]:https://crates.io/crates/panic-halt
 [`panic-itm`]:https://crates.io/crates/panic-itm
 [`panic-semihosting`]:https://crates.io/crates/panic-semihosting
@@ -42,11 +42,11 @@ extern crate panic_abort;
 // ..
 ```
 
-在此示例中，使用开发人员配置文件(`cargo build`)时，板条箱链接到`panic-halt`板条箱，而当使用发布配置文件构建时，则链接到`panic-abort`板条箱(`cargo build --release `)。
+在此示例中，使用开发人员配置文件(`cargo build`)构建时，crate链接到`panic-halt`，而当使用发布配置文件构建时，则链接到`panic-abort`crate(`cargo build --release `)。
 
 ##  一个例子
 
-这是一个尝试索引超出的示例。该操作导致恐慌。
+这是一个尝试索引越界的示例。该操作导致恐慌。
 
 ```rust , ignore
 #![no_main]
@@ -66,7 +66,7 @@ fn main() -> ! {
 }
 ```
 
-本示例选择了`panic-semihosting`恐慌处理行为，该行为将恐慌消息打印到主机控制台。
+本示例选择了`panic-semihosting`恐慌处理方式，该方式将恐慌消息打印到主机控制台。
 
 ``` console
 $ cargo run

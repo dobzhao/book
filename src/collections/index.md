@@ -9,7 +9,7 @@
 `core`本身是没有动态内存分配的,但是编译器自带了一个**unstable**的`alloc` crate支持动态内存分配.
 
  
-如果需要容器，基于堆的实现不是唯一的选择。您还可以使用“固定容量”容器；可以在['heapless`]crate中找到一种这样的实现。
+如果需要容器，基于堆的实现不是唯一的选择。您还可以使用“固定容量”容器；可以在[`heapless`]crate中找到一种这样的实现。
 
 [`heapless`]:https://crates.io/crates/heapless
 

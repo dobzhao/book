@@ -34,7 +34,7 @@ pub fn into_input_high_z(self) -> GpioConfig<Enabled, Input, HighZ> {
 }
 ```
 
-我们返回的GpioConfig在运行时永远不会存在。调用此函数实际上就是一条汇编指令-将一个常量写入到寄存器中。这意味着我们开发的类型状态机接口是一种零成本的抽象方法(zero cost abstraction)-它不需要使用CPU，RAM或代码空间来跟踪`GpioConfig`的状态，最终优化后与手写的直接写寄存器的代码相同。
+我们返回的GpioConfig在运行时永远不会存在。调用此函数实际上就是一条汇编指令-将一个常量写入到寄存器中。这意味着我们开发的类型状态机接口是一种零成本的抽象方法(zero cost abstraction)--它不需要使用CPU，RAM或代码空间来跟踪`GpioConfig`的状态，最终优化后与手写的直接写寄存器的代码相同。
 
 ## 嵌套
 

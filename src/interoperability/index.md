@@ -35,7 +35,7 @@ unsafe fn foo(num: u32) {
 
  [问题# 61]上有我们收集的示例。
 
-[问题# 61]:https：//github.com/rust-embedded/book/issues/61
+[问题# 61]:https://github.com/rust-embedded/book/issues/61
 
 
 ## 与RTOS的互操作性
@@ -44,4 +44,4 @@ unsafe fn foo(num: u32) {
 
 [问题# 62]上有我们收集的示例。
 
-[问题# 62]:https：//github.com/rust-embedded/book/issues/62
+[问题# 62]:https://github.com/rust-embedded/book/issues/62

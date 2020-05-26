@@ -1,16 +1,16 @@
-# The Embedded Rust Book
+# 嵌入式Rust编程
 
-> Documentation on how to use the Rust Programming Language to develop firmware for bare metal (microcontroller) devices
+>有关如何使用Rust编程语言为裸机（微控制器）设备开发固件的文档
 
-This project is developed and maintained by the [Resources team][team].
+此项目由[资源团队] [团队]开发和维护。
 
-See [the issue tracker] for more details. This book is a living document, and is updated continuously.
+有关更多详细信息，请参见[问题跟踪器]。这本书是一份有生命的文件，并不断更新。
 
-[the issue tracker]: https://github.com/rust-embedded/book/issues
+[问题跟踪器]：https://github.com/nkbai/book/issues
 
-## Online Copies of this Book
+## 本书的在线副本
 
-This book is located at https://docs.rust-embedded.org/book/
+本书位于 https://stevenbai.top/rustbook/book/
 
 ## License
 
@@ -32,15 +32,5 @@ Copies of the licenses used by this project may also be found here:
 [Apache License v2.0 Hosted]: http://www.apache.org/licenses/LICENSE-2.0
 [CC-BY-SA v4.0 Hosted]: https://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-### Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be licensed as above, without any additional terms or conditions.
-
-## Code of Conduct
-
-Contribution to this crate is organized under the terms of the [Rust Code of
-Conduct][CoC], the maintainer of this crate, the [Resources team][team], promises
-to intervene to uphold that code of conduct.
-
-[CoC]: CODE_OF_CONDUCT.md
-[team]: https://github.com/rust-embedded/wg#the-resources-team
+ 

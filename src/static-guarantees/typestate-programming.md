@@ -58,7 +58,7 @@ fn main() {
 
 ## 强类型
 
-由于Rust具有[强类型系统]，因此没有简单的方法直接创建`Foo`实例，或将`FooBuilder`转换为`Foo`而无需调用`into_foo()`方法。另外，调用`into_foo()`方法会消耗原始的`FooBuilder`对象，这意味着如果不创建新实例就无法重用它。
+由于Rust具有[强类型系统]，因此没有简单的方法直接创建`Foo`实例，或将`FooBuilder`转换为`Foo`而无需调用`into_foo()`方法。另外调用`into_foo()`方法会消耗原始的`FooBuilder`对象，这意味着如果不创建新实例就无法重用它。
 
 [强类型系统]: https://en.wikipedia.org/wiki/Strong_and_weak_typing
 

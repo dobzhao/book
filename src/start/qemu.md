@@ -5,7 +5,7 @@
 [LM3S6965]:http://www.ti.com/product/LM3S6965
 
 **重要**
-在本教程中，我们将名称“app”用作项目名称。每当您看到“app”一词时，都应将其替换为自己的项目名称。或者，您也可以将项目命名为“app”以避免替换。
+在本教程中，我们将名称“app”用作项目名称。每当您看到“app”一词时，都应将其替换为自己的项目名称。或者您也可以直接将项目命名为“app”以避免替换。
 
 ## 创建一个非标准的Rust程序
 
@@ -37,7 +37,7 @@ cargo generate --git https://github.com/rust-embedded/cortex-m-quickstart
 cd app
 ```
 
-### 使用`git`
+### 使用git
 
 克隆存储库
 
@@ -46,7 +46,7 @@ git clone https://github.com/rust-embedded/cortex-m-quickstart app
 cd app
 ```
 
-And then fill in the placeholders in the `Cargo.toml` file
+然后将 `Cargo.toml` 中的`{{authors}}`,`{{project-name}}`替换为你自己的. 
 
 ```toml
 [package]
@@ -74,9 +74,9 @@ mv cortex-m-quickstart-master app
 cd app
 ```
 
-或者，您可以浏览到[`cortex-m-quickstart`]，单击绿色的“克隆或下载”按钮，然后单击“下载ZIP”。
+或者，您可以使用浏览器访问[`cortex-m-quickstart`]，单击绿色的“clone or download”按钮，然后单击“Download ZIP”。
 
-然后按照“使用git”一节中的第二部分中的操作，在Cargo.toml文件中填写占位符。
+然后按照[`使用git`](#使用git)一节中的第二部分中的操作，在Cargo.toml文件中填写自定义内容。
 
 ## 程序概述
 
@@ -100,22 +100,22 @@ fn main() -> ! {
 
 该程序与标准Rust程序有点不同，因此让我们仔细看一下。
 
-`#![no_std]`表示此程序*不会*链接到标准库,而是链接到其子集：`core` crate。
+`#![no_std]`表示此程序*不会*链接到标准库,而是链接到其子集--核心库。
 
 `#![no_main]`表示该程序将不使用大多数Rust程序使用的标准`main`接口。使用no_main的主要原因是在no_std上下文中使用main函数需要Rust的nightly版本。
 
 `extern crate panic_halt;`。这个crate提供了一个 `panic_handler`，它定义了程序的恐慌行为。我们将在本书的[Panicking](panicking.md)一章中对此进行详细介绍。
 
-[`#[entry]`][entry]是[`cortex-m-rt`]crate提供的属性，用于标记程序的入口点。由于我们没有使用标准的“ main”接口，因此需要另一种方式来指示程序的入口点，即 `#[entry]`。
+[`#[entry]`][entry]是[`cortex-m-rt`]crate提供的属性，用于标记程序的入口。由于我们没有使用标准的“ main”接口，因此需要另一种方式来指示程序的入口，即 `#[entry]`。
 
 [entry]:https://docs.rs/cortex-m-rt-macros/latest/cortex_m_rt_macros/attr.entry.html
 [`cortex-m-rt`]:https://crates.io/crates/cortex-m-rt
 
-注意main函数的签名是`fn main() -> !` ,因为我们的程序将是目标硬件上唯一的程序，所以我们不希望它结束​​！我们使用[发散函数](https://doc.rust-lang.org/rust-by-example/fn/diverging.html)(函数签名中的`->！`表示没有返回值)来在编译时确保main不会结束。
+注意main函数的签名是`fn main() -> !` ,因为我们的程序是目标硬件上唯一的程序，所以我们不希望它结束​​！我们使用[发散函数](https://doc.rust-lang.org/rust-by-example/fn/diverging.html)(函数签名中的`->！`表示没有返回值)来在编译时确保main不会结束。
 
 ## 交叉编译
 
-下一步是交叉编译针对Cortex-M3架构的程序。如果您知道编译目标($TRIPLE)应该是什么，那就直接运行`cargo build --target $ TRIPLE`。不知道也没关系,模板项目中的.cargo/config里有答案：
+下一步是针对Cortex-M3架构进行交叉编译。如果您知道编译目标($TRIPLE)应该是什么，那就直接运行`cargo build --target $TRIPLE`。不知道也没关系,模板项目中的.cargo/config里有答案：
 
 ```console
 tail -n6 .cargo/config
@@ -148,7 +148,7 @@ cargo readobj --bin app -- -file-headers
 ```
 
 注意：
-*`--bin app`是用于检查``target/$TRIPLE/debug/app`这个二进制文件
+*`--bin app`是用于检查`target/$TRIPLE/debug/app`这个二进制文件
 *`--bin app`还会在必要时(重新)编译二进制文件
 
 
@@ -177,9 +177,8 @@ ELF Header:
 
 `cargo-size`可以打印二进制文件的链接器部分的大小。
 
-> **注意**此输出假定已经合并了rust-embedd/cortex-m-rt111
-!todo 这句话啥意思啊?
-
+> **注意**此输出假定已经合并了[rust-embedded/cortex-m-rt#111](https://github.com/rust-embedded/cortex-m-rt/pull/111)这个PR
+ 
 
 ```console
 cargo size --bin app --release -- -A
@@ -212,10 +211,10 @@ Total              14570
 
 >关于ELF链接器部分的复习
 >
->- `.text`包含程序说明
+>- `.text`包含程序代码
 >- `.rodata`包含常量值，例如字符串
 >- `.data`包含静态分配的变量，其初始值为非零
->- `.bss`也包含静态分配的变量，其初始值为零
+>- `.bss`包含静态分配的变量，其初始值为零
 >- `.vector_table`是非标准部分,用于存储中断向量表
 >- `.ARM.attributes`和`.debug_ *`部分包含元数据，这部分数据不会写入目标开发板的flash上。
 
@@ -227,7 +226,7 @@ Total              14570
 cargo objdump --bin app --release -- -disassemble -no-show-raw-insn -print-imm-hex
 ```
 
-> **注意**此输出在您的系统上可能会有所不同。 不同版本的rustc，LLVM和库都会生成不同的程序集。另外,由于空间问题,我们也对内容做了删减。
+> **注意**此输出在您的系统上可能会有所不同。 不同版本的rustc，LLVM和库都会生成不同的指令。另外,由于空间问题,我们也对内容做了删减。
 
 ```text
 app:  file format ELF32-arm-little
@@ -297,7 +296,7 @@ fn main() -> ! {
 }
 ```
 
-该程序使用一种称为半主机(semihosting)的方式将文本打印到*host*控制台。在使用实际硬件时，这需要调试会话支持，但是在使用QEMU时，直接使用就行了。
+该程序使用一种称为半主机(semihosting)的方式将文本打印到*主机*控制台。在使用实际硬件时，这需要调试会话支持，但是在使用QEMU时，直接使用就行了。
 
 让我们从编译示例开始：
 
@@ -322,7 +321,7 @@ qemu-system-arm \
 Hello, world!
 ```
 
-打印文本后，该命令应成功退出退出代码为0)。在*nix上，您可以使用以下命令进行检查：
+打印文本后，该命令应成功退出退出代码为0。在*nix上，您可以使用以下命令进行检查：
 
 ```console
 echo $?
@@ -334,9 +333,9 @@ echo $?
 
 让我们分解一下QEMU命令：
 
--`qemu-system-arm` 这是QEMU仿真器。QEMU支持很多不同架构的处理。从名字可以看出,这是ARM处理器的完整仿真。
+-`qemu-system-arm` 这是QEMU仿真器。QEMU支持很多不同的架构。从名字可以看出,这是ARM处理器的完整仿真。
 
--`-cpu cortex-m3`。这告诉QEMU模拟Cortex-M3 CPU。指定CPU型号可以让我们捕获一些错误编译错误：例如，运行针对具有硬件FPU的Cortex-M4F编译的程序，QEMU将在其运行期间产生错误。
+-`-cpu cortex-m3`。这告诉QEMU模拟Cortex-M3 CPU。指定CPU型号可以让我们捕获一些编译参数不当错误：例如，运行针对具有硬件FPU的Cortex-M4F编译的程序，QEMU将在其运行期间产生错误。
 
 -`-machine lm3s6965evb`。这告诉QEMU模拟LM3S6965EVB，这是一个包含LM3S6965微控制器的开发板。
 
@@ -379,7 +378,7 @@ Hello, world!
 
 远程调试涉及客户端和服务器。针对QEMU，客户端将是GDB(或LLDB)进程，而服务器将是运行嵌入式程序的QEMU进程。
 
-在本节中，我们将使用已经编译的“ hello”示例。
+在本节中，我们将使用已经编译的“hello”示例。
 
 调试的第一步是在调试模式下启动QEMU：
 
@@ -421,7 +420,7 @@ Reset () at $REGISTRY/cortex-m-rt-0.6.1/src/lib.rs:473
 473     pub unsafe extern "C" fn Reset() -> ! {
 ```
 
-您会看到该进程已停止，并且程序计数器指向了一个名为“ Reset”的函数。那就是重启入口：即Cortex-M启动时执行程序的入口。
+您会看到该进程已停止，并且程序计数器指向了一个名为“Reset”的函数。那就是重启入口：即Cortex-M启动时执行程序的入口。
 
 该函数最终将调用我们的main函数。让我们使用断点和`continue`命令一路跳过：
 
