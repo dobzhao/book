@@ -1,8 +1,9 @@
 # 介绍
 
-欢迎阅读《嵌入式Rust手册》: 一本介绍使用Rust在
+欢迎阅读《嵌入式Rust编程》: 一本介绍使用Rust在
 “裸机”嵌入式系统(例如微控制器)上编程的入门书籍。
 
+本书[github地址](https://github.com/nkbai/book) 欢迎提出问题. [英文原书地址](https://github.com/rust-embedded/book)
 ## 本书的潜在读者
 
 本书适用于希望使用Rust提供的高级概念和安全性的嵌入式开发工程师。(另请参见[Rust的目标对象](https://doc.rust-lang.org/book/ch00-00-introduction.html))
