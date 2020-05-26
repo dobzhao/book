@@ -150,7 +150,7 @@
                         <h1><a class="header" href="#qemu" id="qemu">QEMU</a></h1>
 <p>我们现在开始为Cortex-M3微控制器<a href="http://www.ti.com/product/LM3S6965">LM3S6965</a>编写程序。我们选择这个作为我们的最初目标是因为它可以使用QEMU <a href="https://wiki.qemu.org/Documentation/Platforms/ARM#Supported_in_qemu-system-arm">模拟</a>，因此在本节中您无需关心硬件，只需专注于工具和开发过程。</p>
 <p><strong>重要</strong>
-在本教程中，我们将名称“app”用作项目名称。每当您看到“app”一词时，都应将其替换为自己的项目名称。或者，您也可以将项目命名为“app”以避免替换。</p>
+在本教程中，我们将名称“app”用作项目名称。每当您看到“app”一词时，都应将其替换为自己的项目名称。或者您也可以直接将项目命名为“app”以避免替换。</p>
 <h2><a class="header" href="#创建一个非标准的rust程序" id="创建一个非标准的rust程序">创建一个非标准的Rust程序</a></h2>
 <p>我们将使用<a href="https://github.com/rust-embedded/cortex-m-quickstart"><code>cortex-m-quickstart</code></a>项目模板生成一个新项目。</p>
 <h3><a class="header" href="#使用cargo-generate" id="使用cargo-generate">使用<code>cargo-generate</code></a></h3>
@@ -166,12 +166,12 @@
 </code></pre>
 <pre><code class="language-console">cd app
 </code></pre>
-<h3><a class="header" href="#使用git" id="使用git">使用<code>git</code></a></h3>
+<h3><a class="header" href="#使用git" id="使用git">使用git</a></h3>
 <p>克隆存储库</p>
 <pre><code class="language-console">git clone https://github.com/rust-embedded/cortex-m-quickstart app
 cd app
 </code></pre>
-<p>And then fill in the placeholders in the <code>Cargo.toml</code> file</p>
+<p>然后将 <code>Cargo.toml</code> 中的<code>{{authors}}</code>,<code>{{project-name}}</code>替换为你自己的. </p>
 <pre><code class="language-toml">[package]
 authors = [&quot;{{authors}}&quot;] # &quot;{{authors}}&quot; -&gt; &quot;John Smith&quot;
 edition = &quot;2018&quot;
@@ -192,8 +192,8 @@ unzip master.zip
 mv cortex-m-quickstart-master app
 cd app
 </code></pre>
-<p>或者，您可以浏览到<a href="https://github.com/rust-embedded/cortex-m-quickstart"><code>cortex-m-quickstart</code></a>，单击绿色的“克隆或下载”按钮，然后单击“下载ZIP”。</p>
-<p>然后按照“使用git”一节中的第二部分中的操作，在Cargo.toml文件中填写占位符。</p>
+<p>或者，您可以使用浏览器访问<a href="https://github.com/rust-embedded/cortex-m-quickstart"><code>cortex-m-quickstart</code></a>，单击绿色的“clone or download”按钮，然后单击“Download ZIP”。</p>
+<p>然后按照<a href="#%E4%BD%BF%E7%94%A8git"><code>使用git</code></a>一节中的第二部分中的操作，在Cargo.toml文件中填写自定义内容。</p>
 <h2><a class="header" href="#程序概述" id="程序概述">程序概述</a></h2>
 <p>为了方便起见，这是<code>src/main.rs</code>中源代码的最重要部分：</p>
 <pre><code class="language-rust ignore">#![no_std]
@@ -211,13 +211,13 @@ fn main() -&gt; ! {
 }
 </code></pre>
 <p>该程序与标准Rust程序有点不同，因此让我们仔细看一下。</p>
-<p><code>#![no_std]</code>表示此程序<em>不会</em>链接到标准库,而是链接到其子集：<code>core</code> crate。</p>
+<p><code>#![no_std]</code>表示此程序<em>不会</em>链接到标准库,而是链接到其子集--核心库。</p>
 <p><code>#![no_main]</code>表示该程序将不使用大多数Rust程序使用的标准<code>main</code>接口。使用no_main的主要原因是在no_std上下文中使用main函数需要Rust的nightly版本。</p>
 <p><code>extern crate panic_halt;</code>。这个crate提供了一个 <code>panic_handler</code>，它定义了程序的恐慌行为。我们将在本书的<a href="panicking.html">Panicking</a>一章中对此进行详细介绍。</p>
-<p><a href="https://docs.rs/cortex-m-rt-macros/latest/cortex_m_rt_macros/attr.entry.html"><code>#[entry]</code></a>是<a href="https://crates.io/crates/cortex-m-rt"><code>cortex-m-rt</code></a>crate提供的属性，用于标记程序的入口点。由于我们没有使用标准的“ main”接口，因此需要另一种方式来指示程序的入口点，即 <code>#[entry]</code>。</p>
-<p>注意main函数的签名是<code>fn main() -&gt; !</code> ,因为我们的程序将是目标硬件上唯一的程序，所以我们不希望它结束​​！我们使用<a href="https://doc.rust-lang.org/rust-by-example/fn/diverging.html">发散函数</a>(函数签名中的<code>-&gt;！</code>表示没有返回值)来在编译时确保main不会结束。</p>
+<p><a href="https://docs.rs/cortex-m-rt-macros/latest/cortex_m_rt_macros/attr.entry.html"><code>#[entry]</code></a>是<a href="https://crates.io/crates/cortex-m-rt"><code>cortex-m-rt</code></a>crate提供的属性，用于标记程序的入口。由于我们没有使用标准的“ main”接口，因此需要另一种方式来指示程序的入口，即 <code>#[entry]</code>。</p>
+<p>注意main函数的签名是<code>fn main() -&gt; !</code> ,因为我们的程序是目标硬件上唯一的程序，所以我们不希望它结束​​！我们使用<a href="https://doc.rust-lang.org/rust-by-example/fn/diverging.html">发散函数</a>(函数签名中的<code>-&gt;！</code>表示没有返回值)来在编译时确保main不会结束。</p>
 <h2><a class="header" href="#交叉编译" id="交叉编译">交叉编译</a></h2>
-<p>下一步是交叉编译针对Cortex-M3架构的程序。如果您知道编译目标($TRIPLE)应该是什么，那就直接运行<code>cargo build --target $ TRIPLE</code>。不知道也没关系,模板项目中的.cargo/config里有答案：</p>
+<p>下一步是针对Cortex-M3架构进行交叉编译。如果您知道编译目标($TRIPLE)应该是什么，那就直接运行<code>cargo build --target $TRIPLE</code>。不知道也没关系,模板项目中的.cargo/config里有答案：</p>
 <pre><code class="language-console">tail -n6 .cargo/config
 </code></pre>
 <pre><code class="language-toml">[build]
@@ -237,7 +237,8 @@ cargo build
 <pre><code class="language-console">cargo readobj --bin app -- -file-headers
 </code></pre>
 <p>注意：
-*<code>--bin app</code>是用于检查``target/$TRIPLE/debug/app<code>这个二进制文件 *</code>--bin app`还会在必要时(重新)编译二进制文件</p>
+*<code>--bin app</code>是用于检查<code>target/$TRIPLE/debug/app</code>这个二进制文件
+*<code>--bin app</code>还会在必要时(重新)编译二进制文件</p>
 <pre><code class="language-text">ELF Header:
   Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00
   Class:                             ELF32
@@ -261,8 +262,7 @@ cargo build
 </code></pre>
 <p><code>cargo-size</code>可以打印二进制文件的链接器部分的大小。</p>
 <blockquote>
-<p><strong>注意</strong>此输出假定已经合并了rust-embedd/cortex-m-rt111
-!todo 这句话啥意思啊?</p>
+<p><strong>注意</strong>此输出假定已经合并了<a href="https://github.com/rust-embedded/cortex-m-rt/pull/111">rust-embedded/cortex-m-rt#111</a>这个PR</p>
 </blockquote>
 <pre><code class="language-console">cargo size --bin app --release -- -A
 </code></pre>
@@ -290,10 +290,10 @@ Total              14570
 <blockquote>
 <p>关于ELF链接器部分的复习</p>
 <ul>
-<li><code>.text</code>包含程序说明</li>
+<li><code>.text</code>包含程序代码</li>
 <li><code>.rodata</code>包含常量值，例如字符串</li>
 <li><code>.data</code>包含静态分配的变量，其初始值为非零</li>
-<li><code>.bss</code>也包含静态分配的变量，其初始值为零</li>
+<li><code>.bss</code>包含静态分配的变量，其初始值为零</li>
 <li><code>.vector_table</code>是非标准部分,用于存储中断向量表</li>
 <li><code>.ARM.attributes</code>和<code>.debug_ *</code>部分包含元数据，这部分数据不会写入目标开发板的flash上。</li>
 </ul>
@@ -303,7 +303,7 @@ Total              14570
 <pre><code class="language-console">cargo objdump --bin app --release -- -disassemble -no-show-raw-insn -print-imm-hex
 </code></pre>
 <blockquote>
-<p><strong>注意</strong>此输出在您的系统上可能会有所不同。 不同版本的rustc，LLVM和库都会生成不同的程序集。另外,由于空间问题,我们也对内容做了删减。</p>
+<p><strong>注意</strong>此输出在您的系统上可能会有所不同。 不同版本的rustc，LLVM和库都会生成不同的指令。另外,由于空间问题,我们也对内容做了删减。</p>
 </blockquote>
 <pre><code class="language-text">app:  file format ELF32-arm-little
 
@@ -366,7 +366,7 @@ fn main() -&gt; ! {
     loop {}
 }
 </code></pre>
-<p>该程序使用一种称为半主机(semihosting)的方式将文本打印到<em>host</em>控制台。在使用实际硬件时，这需要调试会话支持，但是在使用QEMU时，直接使用就行了。</p>
+<p>该程序使用一种称为半主机(semihosting)的方式将文本打印到<em>主机</em>控制台。在使用实际硬件时，这需要调试会话支持，但是在使用QEMU时，直接使用就行了。</p>
 <p>让我们从编译示例开始：</p>
 <pre><code class="language-console">cargo build --example hello
 </code></pre>
@@ -381,14 +381,14 @@ fn main() -&gt; ! {
 </code></pre>
 <pre><code class="language-text">Hello, world!
 </code></pre>
-<p>打印文本后，该命令应成功退出退出代码为0)。在*nix上，您可以使用以下命令进行检查：</p>
+<p>打印文本后，该命令应成功退出退出代码为0。在*nix上，您可以使用以下命令进行检查：</p>
 <pre><code class="language-console">echo $?
 </code></pre>
 <pre><code class="language-text">0
 </code></pre>
 <p>让我们分解一下QEMU命令：</p>
-<p>-<code>qemu-system-arm</code> 这是QEMU仿真器。QEMU支持很多不同架构的处理。从名字可以看出,这是ARM处理器的完整仿真。</p>
-<p>-<code>-cpu cortex-m3</code>。这告诉QEMU模拟Cortex-M3 CPU。指定CPU型号可以让我们捕获一些错误编译错误：例如，运行针对具有硬件FPU的Cortex-M4F编译的程序，QEMU将在其运行期间产生错误。</p>
+<p>-<code>qemu-system-arm</code> 这是QEMU仿真器。QEMU支持很多不同的架构。从名字可以看出,这是ARM处理器的完整仿真。</p>
+<p>-<code>-cpu cortex-m3</code>。这告诉QEMU模拟Cortex-M3 CPU。指定CPU型号可以让我们捕获一些编译参数不当错误：例如，运行针对具有硬件FPU的Cortex-M4F编译的程序，QEMU将在其运行期间产生错误。</p>
 <p>-<code>-machine lm3s6965evb</code>。这告诉QEMU模拟LM3S6965EVB，这是一个包含LM3S6965微控制器的开发板。</p>
 <p>-<code>-nographic</code>。这告诉QEMU不要启动其GUI。</p>
 <p>-<code>-semihosting-config(..)</code>。这告诉QEMU启用半主机。半主机使仿真设备可以使用主机stdout，stderr和stdin并在主机上创建文件。</p>
@@ -412,7 +412,7 @@ Hello, world!
 <p>调试对于嵌入式开发至关重要。让我们看看它是如何完成的。</p>
 <p>调试嵌入式设备涉及远程调试，因为要调试的程序不会在运行调试器程序(GDB或LLDB)的计算机上运行。</p>
 <p>远程调试涉及客户端和服务器。针对QEMU，客户端将是GDB(或LLDB)进程，而服务器将是运行嵌入式程序的QEMU进程。</p>
-<p>在本节中，我们将使用已经编译的“ hello”示例。</p>
+<p>在本节中，我们将使用已经编译的“hello”示例。</p>
 <p>调试的第一步是在调试模式下启动QEMU：</p>
 <pre><code class="language-console">qemu-system-arm \
   -cpu cortex-m3 \
@@ -443,7 +443,7 @@ Hello, world!
 Reset () at $REGISTRY/cortex-m-rt-0.6.1/src/lib.rs:473
 473     pub unsafe extern &quot;C&quot; fn Reset() -&gt; ! {
 </code></pre>
-<p>您会看到该进程已停止，并且程序计数器指向了一个名为“ Reset”的函数。那就是重启入口：即Cortex-M启动时执行程序的入口。</p>
+<p>您会看到该进程已停止，并且程序计数器指向了一个名为“Reset”的函数。那就是重启入口：即Cortex-M启动时执行程序的入口。</p>
 <p>该函数最终将调用我们的main函数。让我们使用断点和<code>continue</code>命令一路跳过：</p>
 <pre><code class="language-console">break main
 </code></pre>

@@ -166,8 +166,8 @@ fn SysTick() {
     *COUNT += 1;
 }
 </code></pre>
-<p>如您所知，在函数中使用<code>static mut</code>变量使其成为<a href="https://en.wikipedia.org/wiki/Reentrancy_(computing)">不可重入</a>。 从多个异常/中断处理程序或<code>main</code>中直接或间接调用不可重入函数是不确定的行为。</p>
-<p>Safe Rust绝不能导致不确定的行为，因此非可重入函数必须标记为 <code>unsafe</code>。但是我刚刚却说异常处理程序可以安全地使用<code>static mut</code>变量。这怎么可能？这是可能的，因为异常处理程序不能被函数调用，因此无法重入。</p>
+<p>如您所知，使用<code>static mut</code>变量使函数<a href="https://en.wikipedia.org/wiki/Reentrancy_(computing)">不可重入</a>。 从多个异常/中断处理程序或<code>main</code>中直接或间接调用不可重入函数是不确定(UB undefined behavior)的行为。</p>
+<p>Safe Rust绝不能导致不确定的行为，因此非可重入函数必须标记为 <code>unsafe</code>。但是我刚刚却说异常处理程序可以安全地使用<code>static mut</code>变量。这怎么可能？这是可能的，因为异常处理程序不能被其他函数调用，因此不可能发生重入。</p>
 <h2><a class="header" href="#一个完整的例子" id="一个完整的例子">一个完整的例子</a></h2>
 <p>这是一个使用系统计时器每秒引发一次<code>SysTick</code> 异常的示例。 SysTick异常处理程序通过COUNT变量跟踪自己被调用了多少次，然后使用半主机将COUNT的值打印到主机控制台。</p>
 <blockquote>
@@ -240,7 +240,7 @@ cortex-m-semihosting = &quot;0.3.1&quot;
      Running `qemu-system-arm -cpu cortex-m3 -machine lm3s6965evb (..)
 123456789
 </code></pre>
-<p>如果在开发板上运行此命令，则会在OpenOCD控制台上看到输出。但是当计数达到9时，程序将<strong>不</strong>停止。</p>
+<p>如果在开发板上运行此命令，则会在OpenOCD控制台上看到输出。只不过当计数达到9时，程序将<strong>不</strong>停止。</p>
 <h2><a class="header" href="#默认异常处理程序" id="默认异常处理程序">默认异常处理程序</a></h2>
 <p><code>exception</code>属性的实际作用是<strong>覆盖</strong>特定异常的默认异常处理程序。如果您不重写特定异常的处理程序，它将由<code>DefaultHandler</code>函数处理，该函数默认为：</p>
 <pre><code class="language-rust ignore">fn DefaultHandler() {
@@ -254,13 +254,13 @@ fn DefaultHandler(irqn: i16) {
     // custom default handler
 }
 </code></pre>
-<p>irqn是正在处理的异常编号。负值表示Cortex-M异常；零或正值表示设备特定的异常，即AKA中断。</p>
+<p>irqn是正在处理的异常编号。负值表示Cortex-M异常；零或正值表示设备特定的异常，即中断。</p>
 <h2><a class="header" href="#硬故障处理程序" id="硬故障处理程序">硬故障处理程序</a></h2>
 <p><code>HardFault</code>异常有点特殊。当程序进入无效状态时，将引发此异常，因此它的处理程序不能返回，因为这可能导致未定义的行为。另外，在调用用户定义的<code>HardFault</code>前，运行时crate会做一些工作以提高程序的可调试性。</p>
 <p>所以<code>HardFault</code>处理函数必须具有以下签名：<code>fn(＆ExceptionFrame)-&gt;！</code>。处理程序的参数是指向被异常压入堆栈的寄存器的指针。这些寄存器是异常触发时处理器状态的快照，可用于诊断故障。</p>
 <p>这是一个执行非法操作的示例：读取不存在的内存位置。</p>
 <blockquote>
-<p><strong>注意</strong>：该程序在QEMU上不起作用，即不会崩溃，因为<code>qemu-system-arm -machine lm3s6965evb</code>不会检查内存读取，并且在读取到无效内存时会很高兴地返回<code>0</code>。</p>
+<p><strong>注意</strong>：该程序在QEMU上不会发生崩溃，因为<code>qemu-system-arm -machine lm3s6965evb</code>不会检查内存读取，并且在读取到无效内存时会很高兴地返回<code>0</code>。</p>
 </blockquote>
 <pre><code class="language-rust ignore">#![no_main]
 #![no_std]
@@ -316,7 +316,7 @@ ResetTrampoline:
  800094a:       ldr     r0, [r0]
  800094c:       b       #-0x4 &lt;ResetTrampoline+0xa&gt;
 </code></pre>
-<p>您可以在反汇编中查找程序计数器<code>0x0800094a</code> 的值。您将看到加载操作(<code>ldr r0，[r0]</code>)引起了异常。 <code>ExceptionFrame</code>的<code>r0</code>字段将告诉您寄存器r0的值为当时的0x3fff_fffe。</p>
+<p>您可以在反汇编中查找程序计数器<code>0x0800094a</code> 的值。您将看到加载操作(<code>ldr r0，[r0]</code>)引起了异常。 <code>ExceptionFrame</code>的<code>r0</code>字段将告诉您当时寄存器r0的值为0x3fff_fffe。</p>
 
                     </main>
 

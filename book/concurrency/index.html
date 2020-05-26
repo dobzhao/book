@@ -152,7 +152,7 @@
 <ul>
 <li>中断处理程序，每当相关中断发生时运行，</li>
 <li>多种形式的多线程，您的微处理器定期在程序的各个部分之间进行交换，</li>
-<li>在某些系统中是多核微处理器，其中每个核可以同时独立运行程序的不同部分。</li>
+<li>在多核微处理器中，其中每个核可以同时独立运行程序的不同部分。</li>
 </ul>
 <p>由于许多嵌入式程序需要处理中断，因此并发通常迟早会出现，这也是可能会发生许多细微而困难的错误的地方。幸运的是，Rust提供了许多抽象和安全保证来帮助我们编写正确的代码。</p>
 <h2><a class="header" href="#没有并发" id="没有并发">没有并发</a></h2>
@@ -255,8 +255,8 @@ fn timer() {
 }
 </code></pre>
 <p>这次，COUNTER是一个安全的static变量。由于使用了<code>AtomicUsize</code>类型，可以从中断处理程序和主线程安全地修改`COUNTER'，而无需禁用中断。如果可能，这是一个更好的解决方案-但您的平台可能不支持它。</p>
-<p>关于[<code>Ordering]的注释：这会影响编译器和硬件如何对指令进行重新排序，并对缓存可见性产生影响。假设目标是单核心平台，那么 </code>Relaxed`就足够了，并且在这种情况下是最有效的选择。更严格的顺序将导致编译器在原子操作前后发出内存屏障。取决于您正在使用原子操作的种类，您可能需要也可能不需要更严格的顺序！原子模型的精确细节非常复杂，在其他地方有最好的描述。</p>
-<p>有关原子操作和顺序的更多详细信息，请参见<a href="https%EF%BC%9A//doc.rust-lang.org/nomicon/atomics.html">nomicon</a>。</p>
+<p>关于<a href="https://doc.rust-lang.org/core/sync/atomic/enum.Ordering.html"><code>Ordering</code></a>的注释：这会影响编译器和硬件如何对指令进行重新排序，并对缓存可见性产生影响。假设目标是单核心平台，那么 <code>Relaxed</code>就足够了，并且在这种情况下是最有效的选择。更严格的顺序将导致编译器在原子操作前后发出内存屏障。取决于您正在使用原子操作的种类，您可能需要也可能不需要更严格的顺序！原子模型的精确细节非常复杂，在其他地方有最好的描述。</p>
+<p>有关原子操作和顺序的更多详细信息，请参见<a href="https://doc.rust-lang.org/nomicon/atomics.html">nomicon</a>。</p>
 <h2><a class="header" href="#抽象send和sync" id="抽象send和sync">抽象，Send和Sync</a></h2>
 <p>上述解决方案都不是特别令人满意。他们要求使用 <code>unsafe</code>代码(todo atomic方案明明不需要啊?!)，这些代码必须非常仔细地检查并且不符合人体工程学。当然，我们可以在Rust中做得更好！</p>
 <p>我们可以将计数器抽象为一个安全的接口，该接口可以在代码中的其他位置安全地使用。在此示例中，我们将使用临界区计数器，您仍然可以执行类似原子操作的操作。</p>
@@ -353,7 +353,7 @@ fn timer() {
     interrupt::free(|cs| COUNTER.borrow(cs).set(0));
 }
 </code></pre>
-<p>我们现在使用的是<a href="https%EF%BC%9A//doc.rust-lang.org/core/cell/struct.Cell.html"><code>Cell</code></a>，它与<code>RefCell</code>一样用于提供安全的内部可变性。我们已经看到过<code>UnsafeCell</code>，它是Rust中内部可变性的底层：它允许您获取对其包括的值的多个可变引用，但只能使用不安全的代码。一个<code>Cell</code>就像一个<code>UnsafeCell</code>一样，但是它提供了一个安全的接口：它只允许获取当前值的副本或替换当前值，而获取不到引用，并且由于它不满足Sync，因此不能在线程之间共享。这些限制意味着可以安全使用，但是我们不能直接在``static<code>变量中使用它，因为</code>static`必须为Sync。</p>
+<p>我们现在使用的是<a href="https://doc.rust-lang.org/core/cell/struct.Cell.html"><code>Cell</code></a>，它与<code>RefCell</code>一样用于提供安全的内部可变性。我们已经看到过<code>UnsafeCell</code>，它是Rust中内部可变性的基础：它允许您获取对其包括的值的多个可变引用，但只能使用不安全的代码。一个<code>Cell</code>就像一个<code>UnsafeCell</code>一样，但是它提供了一个安全的接口：它只允许获取当前值的副本或替换当前值，而获取不到引用，并且由于它不满足Sync，因此不能在线程之间共享。这些限制意味着可以安全使用，但是我们不能直接在<code>static</code>变量中使用它，因为<code>static</code>必须为Sync。</p>
 <p>那么，为什么上面的示例起作用？ <code>Mutex &lt;T&gt;</code>对要任何实现了<code>Send</code>的<code>T</code>(比如这里的<code>Cell</code>)都实现了<code>Sync</code>。它之所以安全，是因为它仅在临界区内允许访问其内容。因此，我们可以实现一个没有任何不安全代码的安全计数器！</p>
 <p>这对于像<code>u32</code>这样的简单类型非常有用，但是对于没有实现<code>Copy</code>的更复杂类型呢？在嵌入式上下文中，一个非常常见的示例是外设结构体，他通常没有实现<code>Copy</code>。针对这种,我们可以使用<code>RefCell</code>。</p>
 <h2><a class="header" href="#共享外设" id="共享外设">共享外设</a></h2>
@@ -423,7 +423,7 @@ fn timer() {
 <pre><code class="language-rust ignore">static MY_GPIO: Mutex&lt;RefCell&lt;Option&lt;stm32f405::GPIOA&gt;&gt;&gt; =
     Mutex::new(RefCell::new(None));
 </code></pre>
-<p>现在，我们的共享变量的类型是<code> Mutex&lt;RefCell&lt;Option&lt;stm32f405::GPIOA&gt;&gt;&gt;</code>。 <code>Mutex”</code>可确保我们仅在临界区内具有访问权限，因此就算是<code>RefCell</code>不支持<code>Sync</code>,变量<code>MY_GPIO</code>也能够支持Sync。 <code>RefCell</code>为我们提供了带有引用的内部可变性， <code>Option</code>使我们可以先将该变量初始化为空，稍后才将其实际内容移入。我们不能直接使用static的单例<code>GPIOA</code>,所有这一切都是必须的。</p>
+<p>现在，我们的共享变量的类型是<code> Mutex&lt;RefCell&lt;Option&lt;stm32f405::GPIOA&gt;&gt;&gt;</code>。 <code>Mutex</code>可确保我们仅在临界区内具有访问权限，因此就算是<code>RefCell</code>不支持<code>Sync</code>,变量<code>MY_GPIO</code>也能够支持Sync。 <code>RefCell</code>为我们提供了带有引用的内部可变性， <code>Option</code>使我们可以先将该变量初始化为空，稍后才将其实际内容移入。我们不能直接使用static的单例<code>GPIOA</code>,所有这一切都是必须的。</p>
 <pre><code class="language-rust ignore">interrupt::free(|cs| MY_GPIO.borrow(cs).replace(Some(dp.GPIOA)));
 </code></pre>
 <p>在临界区内，我们可以在互斥锁上调用 <code>borrow()</code>，从而获得<code>RefCell</code>的引用。然后，我们调用 <code>replace()</code>将新值移入<code>RefCell</code>。</p>
@@ -435,7 +435,7 @@ fn timer() {
 <p>终于我们可以安全并且支持并发的使用<code>MY_GPIO</code>。临界区阻止了中断的发生，并让我们借用到互斥锁。然后<code>RefCell</code>通过<code>as_ref()</code>给我们一个<code>&amp;Option&lt;&amp;GPIOA&gt;</code> ，并跟踪借用范围--一旦借用结束,<code>RefCell</code>会更新其内部的值。
 Finally we use <code>MY_GPIO</code> in a safe and concurrent fashion. The critical section prevents the interrupt firing as usual, and lets us borrow the mutex.  The <code>RefCell</code> then gives us an <code>&amp;Option&lt;GPIOA&gt;</code>, and tracks how long it remains borrowed - once that reference goes out of scope, the <code>RefCell</code> will be updated to indicate it is no longer borrowed.
 todo 感觉这段话是错的,需要验证.</p>
-<p>由于我们无法将<code>GPIOA</code>从<code>＆Option”</code>中移出，因此我们需要使用<code>as_ref()</code>将其转换为<code>&amp;Option&lt;&amp;GPIOA&gt;</code>，最后我们可以通过<code>unwrap()</code> 获得到<code>＆GPIOA</code>，从而可以修改外设状态。(todo 此处应该是可以访问外设)
+<p>由于我们无法将<code>GPIOA</code>从<code>＆Option</code>中移出，因此我们需要使用<code>as_ref()</code>将其转换为<code>&amp;Option&lt;&amp;GPIOA&gt;</code>，最后我们可以通过<code>unwrap()</code> 获得到<code>＆GPIOA</code>，从而可以修改外设状态。(todo 此处应该是可以访问外设)
 todo &amp;GPIOaA是只读借用啊,在怎么修改?</p>
 <p>如果我们需要对共享资源的可变引用，则应该使用<code>borrow_mut</code> 和 <code>deref_mut</code>。以下代码显示了使用TIM2计时器的示例。</p>
 <pre><code class="language-rust ignore">use core::cell::RefCell;
@@ -483,7 +483,7 @@ fn timer() {
 version=&quot;0.6.0&quot;
 features=[&quot;const-fn&quot;]
 </code></pre>
-<p>同时，<code>const-fn</code>已经在稳定版Rust上工作了一段时间。因此预计这个特性很快会成为<code>cortex-m</code>的默认配置,这样以后就不必在Cargo.toml中配置磁特性了。</p>
+<p>同时，<code>const-fn</code>已经在稳定版Rust上工作了一段时间。因此预计这个特性很快会成为<code>cortex-m</code>的默认配置,这样以后就不必在Cargo.toml中配置此特性了。</p>
 </blockquote>
 <p>目前这样虽然安全，但还有点笨拙。我们还有什么可以做的吗？</p>
 <h2><a class="header" href="#rtfm" id="rtfm">RTFM</a></h2>

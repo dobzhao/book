@@ -150,7 +150,7 @@
                         <h1><a class="header" href="#容器" id="容器">容器</a></h1>
 <p>最终，您将要在程序中使用动态数据结构(也就是容器)。 <code>std</code>提供了一组通用容器：<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a>，<a href="https://doc.rust-lang.org/std/string/struct.String.html"><code>String</code></a>，<a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html"><code>HashMap</code></a>等。在<code>std</code>中实现的所有容器都使用了全局动态内存分配器(也称为堆)。</p>
 <p><code>core</code>本身是没有动态内存分配的,但是编译器自带了一个<strong>unstable</strong>的<code>alloc</code> crate支持动态内存分配.</p>
-<p>如果需要容器，基于堆的实现不是唯一的选择。您还可以使用“固定容量”容器；可以在['heapless`]crate中找到一种这样的实现。</p>
+<p>如果需要容器，基于堆的实现不是唯一的选择。您还可以使用“固定容量”容器；可以在<a href="https://crates.io/crates/heapless"><code>heapless</code></a>crate中找到一种这样的实现。</p>
 <p>在本节中，我们将探索和比较这两种实现。</p>
 <h2><a class="header" href="#使用alloc" id="使用alloc">使用<code>alloc</code></a></h2>
 <p>标准的Rust发行版中已经包含了<code>alloc</code>,您可以直接使用它，而无需在Cargo.toml文件中将其声明为依赖项。</p>

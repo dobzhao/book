@@ -148,12 +148,12 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#恐慌panicking" id="恐慌panicking">恐慌(Panicking)</a></h1>
-<p>恐慌是Rust语言的核心部分。诸如索引之类的内置操作会在运行时检查内存安全性。当尝试超出索引范围时，这将导致恐慌。</p>
+<p>恐慌是Rust语言的核心部分。诸如索引之类的内置操作会在运行时检查内存安全性。当尝试超出索引范围时，将导致恐慌。</p>
 <p>在标准库中，恐慌具有确定的行为：恐慌会进行线程栈展开，除非用户选择在恐慌中中止程序。</p>
 <p>但是，在没有标准库的程序中，恐慌行为未定义。可以通过声明一个 <code>#[panic_handler]</code> 函数来选择一种行为。该函数必须在程序的依赖关系中恰好出现一次，并且必须具有以下签名：<code>fn(＆PanicInfo)-&gt;！</code>，其中<a href="https://doc.rust-lang.org/core/panic/struct.PanicInfo.html"><code>PanicInfo</code></a>包含有恐慌相关的位置信息 。</p>
 <p>鉴于嵌入式系统的范围广泛,从消费类电子到对安全至关重要的系统(不能崩溃)，因此没有一种适合所有场景的恐慌处理行为，但是有许多常用行为。这些常见的行为已被打包到定义 <code>#[panic_handler]</code> 功能的crate中,常见的包括：</p>
 <ul>
-<li><a href="https%EF%BC%9A//crates.io/crates/panic-abort"><code>panic-abort</code></a> 恐慌时会执行abort指令。</li>
+<li><a href="https://crates.io/crates/panic-abort"><code>panic-abort</code></a> 恐慌时会执行abort指令。</li>
 <li><a href="https://crates.io/crates/panic-halt"><code>panic-halt</code></a> 恐慌时会导致程序或者其所在线程通过进入死循环的方式停止。</li>
 <li><a href="https://crates.io/crates/panic-itm"><code>panic-itm</code></a> 恐慌消息使用ITM(ARM Cortex-M特定的外围设备)记录。</li>
 <li><a href="https://crates.io/crates/panic-semihosting"><code>panic-semihosting</code></a> 恐慌消息使用半主机技术记录到主机。</li>
@@ -173,9 +173,9 @@ extern crate panic_abort;
 
 // ..
 </code></pre>
-<p>在此示例中，使用开发人员配置文件(<code>cargo build</code>)时，板条箱链接到<code>panic-halt</code>板条箱，而当使用发布配置文件构建时，则链接到<code>panic-abort</code>板条箱(<code>cargo build --release </code>)。</p>
+<p>在此示例中，使用开发人员配置文件(<code>cargo build</code>)构建时，crate链接到<code>panic-halt</code>，而当使用发布配置文件构建时，则链接到<code>panic-abort</code>crate(<code>cargo build --release </code>)。</p>
 <h2><a class="header" href="#一个例子" id="一个例子">一个例子</a></h2>
-<p>这是一个尝试索引超出的示例。该操作导致恐慌。</p>
+<p>这是一个尝试索引越界的示例。该操作导致恐慌。</p>
 <pre><code class="language-rust ignore">#![no_main]
 #![no_std]
 
@@ -192,7 +192,7 @@ fn main() -&gt; ! {
     loop {}
 }
 </code></pre>
-<p>本示例选择了<code>panic-semihosting</code>恐慌处理行为，该行为将恐慌消息打印到主机控制台。</p>
+<p>本示例选择了<code>panic-semihosting</code>恐慌处理方式，该方式将恐慌消息打印到主机控制台。</p>
 <pre><code class="language-console">$ cargo run
      Running `qemu-system-arm -cpu cortex-m3 -machine lm3s6965evb (..)
 panicked at 'index out of bounds: the len is 3 but the index is 4', src/main.rs:12:13

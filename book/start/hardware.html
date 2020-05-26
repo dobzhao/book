@@ -158,9 +158,13 @@
 <li>
 <p>ARM内核是否包括FPU？ Cortex-M4<strong>F</strong>和Cortex-M7<strong>F</strong>内核都有FPU。</p>
 </li>
+<li>
+<p>目标设备有多少闪存和RAM？例如256 KiB的闪存和32 KiB的RAM。</p>
+</li>
+<li>
+<p>闪存和RAM映射的地址空间在哪里？例如RAM通常位于地址“0x2000_0000”。</p>
+</li>
 </ul>
-<p>-目标设备有多少闪存和RAM？例如256 KiB的闪存和32 KiB的RAM。</p>
-<p>-闪存和RAM映射的地址空间在哪里？例如RAM是通常位于地址“0x2000_0000”。</p>
 <p>通常您可以在数据手册或设备的参考手册中找到这些信息。</p>
 <p>在本节中，我们将使用我们的参考硬件STM32F3DISCOVERY。该开发板包含STM32F303VCT6微控制器。该微控制器具有：</p>
 <ul>
@@ -192,7 +196,7 @@
 # target = &quot;thumbv7em-none-eabi&quot;   # Cortex-M4 and Cortex-M7 (no FPU)
 target = &quot;thumbv7em-none-eabihf&quot; # Cortex-M4F and Cortex-M7F (with FPU)
 </code></pre>
-<p>我们将使用<code>thumbv7em-none-eabihf</code>，因为它适合Cortex-M4F内核。</p>
+<p>这次用得是Cortex-M4F内核,所以target使用<code>thumbv7em-none-eabihf</code> 。</p>
 <p>第二步是将存储区域信息输入到“memory.x”文件中。</p>
 <pre><code class="language-console">$ cat memory.x
 /* Linker script for the STM32F303VCT6 */
@@ -203,7 +207,7 @@ MEMORY
   RAM : ORIGIN = 0x20000000, LENGTH = 40K
 }
 </code></pre>
-<p>确保<code>debug::exit()</code>调用已被注释掉或删除，因为他仅用于在QEMU中运行。</p>
+<p>确保<code>debug::exit()</code>调用已被注释掉或删除，因为他仅用于QEMU环境。</p>
 <pre><code class="language-rust ignore">#[entry]
 fn main() -&gt; ! {
     hprintln!(&quot;Hello, world!&quot;).unwrap();
@@ -215,15 +219,15 @@ fn main() -&gt; ! {
     loop {}
 }
 </code></pre>
-<p>现在，您可以像以前一样使用<code>cargo build</code>交叉编译程序，并使用<code>cargo-binutils</code>检查二进制文件。 <code>cortex-m-rt</code> crate可处理使您的芯片运行所需的所有魔术,几乎所有Cortex-M CPU都以相同的方式引导。</p>
+<p>现在，您可以像以前一样使用<code>cargo build</code>交叉编译程序，并使用<code>cargo-binutils</code>检查二进制文件。 <code>cortex-m-rt</code> crate可处理让您的芯片运行所需的所有魔术,几乎所有Cortex-M CPU都以相同的方式引导。</p>
 <pre><code class="language-console">$ cargo build --example hello
 </code></pre>
 <h2><a class="header" href="#调试" id="调试">调试</a></h2>
 <p>调试看起来会有所不同。实际上，根据目标设备的不同，第一步看起来可能会有所不同。在本节中，我们将介绍在STM32F3DISCOVERY上调试程序所需的步骤。有关设备的特定信息，请查看<a href="https://github.com/rust-embedded/debugonomicon">Debugonomicon</a>。</p>
 <p>和以前一样，我们将进行远程调试，客户端是GDB进程,服务器将是OpenOCD。</p>
 <p>$ cat openocd.cfg
-按照<a href="../intro/install/verify.html">验证</a>部分的操作，将开发板连接到笔记本电脑或者PC，并检查是否填充了ST-LINK接头连接器(todo ... check that the ST-LINK header is populated)。</p>
-<p>在终端上，运行“openocd”以连接到开发板上的ST-LINK。从模板的根目录运行此命令；<code>openocd</code>会根据<code>openocd.cfg</code>文件，找到要使用的接口文件和目标文件。</p>
+按照<a href="../intro/install/verify.html">验证</a>部分的操作，将开发板连接到笔记本电脑或者PC，并检查是否插上了ST-LINK跳线帽。</p>
+<p>在终端上，从模板的根目录运行“openocd”以连接到开发板上的ST-LINK。 <code>openocd</code>会根据<code>openocd.cfg</code>文件，找到要使用的接口文件和目标文件。</p>
 <pre><code class="language-console">$ cat openocd.cfg
 </code></pre>
 <pre><code class="language-text"># Sample OpenOCD configuration for the STM32F3DISCOVERY development board
@@ -263,7 +267,7 @@ Info : stm32f3x.cpu: hardware has 6 breakpoints, 4 watchpoints
 <p>在另一个终端上，也从模板的根目录运行GDB。</p>
 <pre><code class="language-console">$ &lt;gdb&gt; -q target/thumbv7em-none-eabihf/debug/examples/hello
 </code></pre>
-<p>接下来，将GDB连接到OpenOCD，OpenOCD正在监听端口3333,等待新的TCP连接。</p>
+<p>接下来，将GDB连接到OpenOCD，OpenOCD正在监听端口3333。</p>
 <pre><code class="language-console">(gdb) target remote :3333
 Remote debugging using :3333
 0x00000000 in ?? ()
@@ -276,7 +280,7 @@ Loading section .rodata, size 0x61c lma 0x8002270
 Start address 0x800144e, load size 10380
 Transfer rate: 17 KB/sec, 3460 bytes/write.
 </code></pre>
-<p>现在程序已加载。该程序使用半主机，因此在进行任何半主机调用之前，我们必须告诉OpenOCD启用半主机。您可以使用“ monitor”将命令发送到OpenOCD。</p>
+<p>现在程序已加载。该程序需要半主机支持，因此在进行任何半主机调用之前，我们必须告诉OpenOCD启用半主机。您可以使用“monitor”将命令发送到OpenOCD。</p>
 <pre><code class="language-console">(gdb) monitor arm semihosting enable
 semihosting is enabled
 </code></pre>
@@ -317,7 +321,7 @@ Info : halted: PC: 0x08000a0c
 Info : halted: PC: 0x08000d70
 Info : halted: PC: 0x08000d72
 </code></pre>
-<p>发出另一个<code>next</code>将使处理器执行<code>debug::exit</code>。这充当断点并中止该过程：</p>
+<p>发出另一个<code>next</code>将使处理器执行<code>debug::exit</code>。这会像断点一样挂起程序的执行：</p>
 <pre><code class="language-console">(gdb) next
 
 Program received signal SIGTRAP, Trace/breakpoint trap.
@@ -333,7 +337,7 @@ Warn : target not halted
 target halted due to breakpoint, current mode: Thread
 xPSR: 0x21000000 pc: 0x08000d76 msp: 0x20009fc0, semihosting
 </code></pre>
-<p>但是，在微控制器上运行的进程尚未终止，您可以使用<code>continue</code>或类似命令将其恢复。</p>
+<p>但是，在微控制器上运行的程序尚未终止，您可以使用<code>continue</code>或类似命令将其恢复。</p>
 <p>现在，您可以使用“ quit”命令退出GDB。</p>
 <pre><code class="language-console">(gdb) quit
 </code></pre>
@@ -357,7 +361,7 @@ load
 # start the process but immediately halt the processor
 stepi
 </code></pre>
-<p>现在运行 <code>&lt;gdb&gt; -x openocd.gdb $program</code>将立即将GDB连接到OpenOCD，启用半主机，加载程序并启动该过程。</p>
+<p>现在运行 <code>&lt;gdb&gt; -x openocd.gdb $program</code>将立即将GDB连接到OpenOCD，启用半主机，加载程序并开始执行。</p>
 <p>您也可以将<code>&lt;gdb&gt; -x openocd.gdb</code>转换为自定义运行器，这样<code>cargo run</code>会自动构建程序并开始GDB会话。该运行器已包含在<code>.cargo/config</code>中，只不过现在是被注释掉的状态。</p>
 <pre><code class="language-console">$ head -n10 .cargo/config
 </code></pre>

@@ -150,7 +150,7 @@
                         <h1><a class="header" href="#验证安装" id="验证安装">验证安装</a></h1>
 <p>在本节中，我们检查是否已正确安装和配置了必需的工具和驱动程序。</p>
 <p>使用micro-USB电缆将开发板连接到笔记本电脑/PC。开发板有两个USB接口。请使用位于板边缘中央的标有“USB ST-LINK”的USB接口。</p>
-<p>还要检查是否已拔掉ST-LINK跳线。见下图； ST-LINK标头用红色圈出。</p>
+<p>还要检查ST-LINK跳线是否连接。见下图； ST-LINK标头用红色圈出。</p>
 <p align="center">
 <img title="Connected discovery board" src="../../assets/verify.jpeg">
 </p>
@@ -180,8 +180,7 @@ Info : stm32f3x.cpu: hardware has 6 breakpoints, 4 watchpoints
 <pre><code class="language-console">$ openocd -f interface/stlink-v2.cfg -f target/stm32f3x.cfg
 </code></pre>
 <p>如果该命令有效，则说明您的开发板的硬件版本较旧。这虽然不是一个问题，但是请记住你稍后需要对配置做一些修改。现在您可以转到<a href="../../start/index.html">下一部分</a>。</p>
-<p>如果这两个命令都不能作为普通用户使用，请尝试以root权限运行它们（例如<code>sudo openocd ..</code>）。如果这时可以正常工作，则请检查[udev规则]是否已正确设置。</p>
-<p>[udev规则]:linux.md# udev-rules</p>
+<p>如果这两个命令都不能作为普通用户使用，请尝试以root权限运行它们（例如<code>sudo openocd ..</code>）。如果这时可以正常工作，则请检查<a href="linux.html#udev-rules">udev规则</a>是否已正确设置。</p>
 <p>如果您到了这一步，OpenOCD无法正常工作，请提交一个<a href="https://github.com/rust-embedded/book/issues">问题</a>，我们将为您提供帮助！</p>
 
                     </main>

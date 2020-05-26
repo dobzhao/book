@@ -147,8 +147,8 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#外围设备作为状态机" id="外围设备作为状态机">外围设备作为状态机</a></h1>
-<p>微控制器的外围设备可以认为是一组状态机。例如，简化的<a href="https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E8%BE%93%E5%85%A5/%E8%BE%93%E5%87%BA">GPIO引脚</a>的配置可以表示为以下状态树:</p>
+                        <h1><a class="header" href="#外设作为状态机" id="外设作为状态机">外设作为状态机</a></h1>
+<p>微控制器的外围设备可以认为是一组状态机。例如，简化的<a href="https://en.wikipedia.org/wiki/General-purpose_input/output">GPIO引脚</a>的配置可以表示为以下状态树:</p>
 <ul>
 <li>禁用</li>
 <li>已启用
@@ -169,14 +169,14 @@
 </ul>
 </li>
 </ul>
-<p>如果外围设备以“禁用”模式启动，想要转移至“输入:高阻”模式，我们必须执行以下步骤:</p>
+<p>如果外围设备以“禁用”模式启动，想要转移至“输入:高电阻”模式，我们必须执行以下步骤:</p>
 <ol>
 <li>禁用模式</li>
 <li>启用</li>
 <li>配置为输入</li>
 <li>输入:高电阻</li>
 </ol>
-<p>如果要从“输入:高阻”转移至“输入:拉低”，则必须执行以下步骤:</p>
+<p>如果要从“输入:高电阻”转移至“输入:拉低”，则必须执行以下步骤:</p>
 <ol>
 <li>输入:高阻</li>
 <li>输入:拉低</li>
@@ -189,19 +189,19 @@
 <li>输出:高</li>
 </ol>
 <h2><a class="header" href="#硬件表示" id="硬件表示">硬件表示</a></h2>
-<p>通常，上面列出的状态是通过将值写入映射到GPIO外设的给定寄存器来设置的。让我们虚拟一个的PIO配置寄存器来说明这一点:</p>
-<table><thead><tr><th align="right">名字</th><th align="right">位号</th><th align="right">值</th><th align="right">含义</th><th align="right">注意事项</th></tr></thead><tbody>
-<tr><td align="right">启用</td><td align="right">0</td><td align="right">0</td><td align="right">禁用</td><td align="right">禁用GPIO</td></tr>
-<tr><td align="right"></td><td align="right"></td><td align="right">1</td><td align="right">启用</td><td align="right">启用GPIO</td></tr>
-<tr><td align="right">方向</td><td align="right">1</td><td align="right">0</td><td align="right">输入</td><td align="right">将方向设置为输入</td></tr>
-<tr><td align="right"></td><td align="right"></td><td align="right">1</td><td align="right">输出</td><td align="right">将方向设置为输出</td></tr>
-<tr><td align="right">输入模式</td><td align="right">2..3</td><td align="right">00</td><td align="right">高电阻</td><td align="right">将输入设置为高阻</td></tr>
-<tr><td align="right"></td><td align="right"></td><td align="right">01</td><td align="right">拉低</td><td align="right">输入引脚被拉低</td></tr>
-<tr><td align="right"></td><td align="right"></td><td align="right">10</td><td align="right">拉高</td><td align="right">输入引脚被拉高</td></tr>
-<tr><td align="right"></td><td align="right"></td><td align="right">11</td><td align="right">状态无效</td><td align="right">不设</td></tr>
-<tr><td align="right">输出模式</td><td align="right">4</td><td align="right">0</td><td align="right">低</td><td align="right">引脚被驱动为低电平</td></tr>
-<tr><td align="right"></td><td align="right"></td><td align="right">1</td><td align="right">高</td><td align="right">输出引脚被驱动为高电平</td></tr>
-<tr><td align="right">输入状态</td><td align="right">5</td><td align="right">x</td><td align="right">输入值</td><td align="right">如果输入&lt;1.5v，则为0；如果输入&gt; = 1.5v，则为1</td></tr>
+<p>通常，上面列出的状态是通过将修改映射到GPIO外设的寄存器来设置的。让我们虚拟一个的PIO配置寄存器来说明这一点:</p>
+<table><thead><tr><th align="left">名字</th><th align="right">位号</th><th align="right">值</th><th align="right">含义</th><th align="left">注意事项</th></tr></thead><tbody>
+<tr><td align="left">启用</td><td align="right">0</td><td align="right">0</td><td align="right">禁用</td><td align="left">禁用GPIO</td></tr>
+<tr><td align="left"></td><td align="right"></td><td align="right">1</td><td align="right">启用</td><td align="left">启用GPIO</td></tr>
+<tr><td align="left">方向</td><td align="right">1</td><td align="right">0</td><td align="right">输入</td><td align="left">将方向设置为输入</td></tr>
+<tr><td align="left"></td><td align="right"></td><td align="right">1</td><td align="right">输出</td><td align="left">将方向设置为输出</td></tr>
+<tr><td align="left">输入模式</td><td align="right">2..3</td><td align="right">00</td><td align="right">高电阻</td><td align="left">将输入设置为高阻</td></tr>
+<tr><td align="left"></td><td align="right"></td><td align="right">01</td><td align="right">拉低</td><td align="left">输入引脚被拉低</td></tr>
+<tr><td align="left"></td><td align="right"></td><td align="right">10</td><td align="right">拉高</td><td align="left">输入引脚被拉高</td></tr>
+<tr><td align="left"></td><td align="right"></td><td align="right">11</td><td align="right">状态无效</td><td align="left">不设</td></tr>
+<tr><td align="left">输出模式</td><td align="right">4</td><td align="right">0</td><td align="right">低</td><td align="left">引脚被驱动为低电平</td></tr>
+<tr><td align="left"></td><td align="right"></td><td align="right">1</td><td align="right">高</td><td align="left">输出引脚被驱动为高电平</td></tr>
+<tr><td align="left">输入状态</td><td align="right">5</td><td align="right">x</td><td align="right">输入值</td><td align="left">如果输入&lt;1.5v，则为0；如果输入&gt; = 1.5v，则为1</td></tr>
 </tbody></table>
 <p>我们可以在Rust中定义以下结构来控制此GPIO:</p>
 <pre><code class="language-rust ignore">/// GPIO interface

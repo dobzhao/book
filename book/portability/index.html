@@ -153,7 +153,7 @@
 <blockquote>
 <p>硬件抽象层是一组例程，它们可以模拟某些特定平台的详细信息，从而使程序可以直接访问硬件资源。</p>
 <p>通过提供对硬件的标准操作系统(OS)调用，从而允许程序员编写与设备无关的高性能应用程序。</p>
-<p>*维基百科：<a href="https://en.wikipedia.org/wiki/Hardware_abstraction">硬件抽象层</a> *</p>
+<p><em>维基百科：<a href="https://en.wikipedia.org/wiki/Hardware_abstraction">硬件抽象层</a></em></p>
 </blockquote>
 <p>嵌入式系统在这方面有点特殊，因为他们通常没有操作系统,也不允许用户安装自己的软件. 并且固件映像是作为一个整体编译的，此外还有许多其他限制。因此尽管维基百科定义的传统方法可能可行，但它很可能不是确保可移植性的最有效的方法。</p>
 <p>我们如何在Rust中做到这一点？那就是<strong>embedded-hal</strong> ...</p>
@@ -170,7 +170,7 @@
 <li>计时器/倒数计数器</li>
 <li>模拟数字转换</li>
 </ul>
-<p>使用<strong>embedded-hal</strong>的Trait和crate的主要原因是为了控制复杂性。如果某个应用程序自己必须独立实现外设的使用方法,独立编写应用程序以及潜在的其硬件驱动程序，那么应该很容易看出其代码可重用性非常有限。如果<strong>M</strong>是外设HAL实现的数量，而<strong>N</strong>是驱动程序的数量，那么如果我们要为每个应用重新发明轮子，那么最终将得到<strong>M*N</strong>种实现. 而使用基于<strong>Embedded-hal</strong>提供的Trait的API来实现，则只需<strong>M+N</strong>种实现。当然还有其他好处，例如由于定义明确且易于使用的API，减少了反复试验。</p>
+<p>使用<strong>embedded-hal</strong>的Trait和crate的主要原因是为了控制复杂性。如果某个应用程序自己必须独立实现外设的使用方法,独立编写应用程序以及潜在的硬件驱动程序，那么应该很容易看出其代码可重用性非常有限。如果<strong>M</strong>是外设HAL实现的数量，而<strong>N</strong>是驱动程序的数量，那么如果我们要为每个应用重新发明轮子，那么最终将得到<strong>M*N</strong>种实现. 而使用基于<strong>Embedded-hal</strong>提供的Trait的API来实现，则只需<strong>M+N</strong>种实现。当然还有其他好处，例如定义明确且易于使用的API，减少了反复试验。</p>
 <h2><a class="header" href="#embedded-hal的使用者" id="embedded-hal的使用者">embedded-hal的使用者</a></h2>
 <p>如上所述，HAL主要有三个使用者：</p>
 <h3><a class="header" href="#hal实现" id="hal实现">HAL实现</a></h3>
@@ -182,15 +182,14 @@
 </ul>
 <p>这样的<strong>HAL实现</strong>可以有多种形式：</p>
 <ul>
-<li>通过低级别的硬件访问，例如通过寄存器</li>
+<li>通过低级别的硬件访问，例如寄存器</li>
 <li>通过操作系统，例如在Linux下使用<code>sysfs</code></li>
 <li>通过适配器，例如模拟单元测试的类型</li>
 <li>通过硬件适配器的驱动程序，例如I2C多路复用器或GPIO扩展器</li>
 </ul>
 <h3><a class="header" href="#驱动" id="驱动">驱动</a></h3>
-<p>驱动程序为内部或外部组件实现了一组自定义功能，这些组件连接到实现了嵌入式hal trait的外围设备。这种驱动程序的典型示例包括各种传感器(温度，磁力计，加速度计，光线)，显示设备(LED阵列，LCD显示屏)和驱动器(电机，发射器)。</p>
-<p>一个驱动程序必须用一个类型实例来初始化，该类型实现了Embedded-hal的某个“trait”，这是通过特征绑定来确保的，并为其自身的类型实例提供一组自定义方法，以允许与被驱动设备进行交互。</p>
-<p>A driver has to be initialized with an instance of type that implements a certain <code>trait</code> of the embedded-hal which is ensured via trait bound and provides its own type instance with a custom set of methods allowing to interact with the driven device.</p>
+<p>驱动程序为内部或外部组件实现了一组自定义功能，这些组件连接到实现了<code>Embedded-hal</code> <code>trait</code>的外围设备。这种驱动程序的典型示例包括各种传感器(温度，磁力计，加速度计，光线)，显示设备(LED阵列，LCD显示屏)和执行器(电机，发射器)。</p>
+<p>一个驱动程序必须用一个实现了<code>Embedded-hal</code>的相应<code>trait</code>的实例来初始化，并提供一组自定义方法，以允许与被驱动设备进行交互。</p>
 <h3><a class="header" href="#应用" id="应用">应用</a></h3>
 <p>该应用程序将各个部分绑定在一起，并确保实现所需的功能。在不同系统之间进行移植时，这是需要花费大量精力的部分，因为应用程序需要通过HAL实现正确地初始化实际硬件，并且不同硬件的初始化有时甚至完全不同。另外，用户的选择通常也起着很大的作用，因为组件可以连接到不同的终端，有时硬件总线需要外部硬件来匹配配置，或者在使用内部外设时需要进行不同的权衡(例如，多个具有不同功能的定时器或外设之间互相冲突)。</p>
 
