@@ -2,15 +2,15 @@
 
 >有关如何使用Rust编程语言为裸机（微控制器）设备开发固件的文档
 
-此项目由[资源团队] [团队]开发和维护。
+此项目由[资源团队](https://github.com/rust-embedded/wg#the-resources-team)开发和维护。
 
 有关更多详细信息，请参见[问题跟踪器]。这本书是一份有生命的文件，并不断更新。
 
-[问题跟踪器]：https://github.com/nkbai/book/issues
+[问题跟踪器]: https://github.com/nkbai/book/issues
 
-## 本书的在线副本
+## 本书发布版本
 
-本书位于 https://stevenbai.top/rustbook/book/
+位于 https://stevenbai.top/rustbook/book/
 
 ## License
 
